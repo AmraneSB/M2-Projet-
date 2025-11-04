@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apollo Beats - Prototype</title>
+<style>
+  body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f0f0; }
+  header { background:#6a5acd; color:white; text-align:center; padding:1rem; display:flex; flex-direction:column; align-items:center; }
+  header img { width:80px; margin-bottom:0.5rem; }
+  main { padding:1rem; }
+  .zone-btn { margin:0.5rem; padding:0.5rem 1rem; background:#9370db; color:white; border:none; border-radius:5px; cursor:pointer; }
+  .oeuvre { border:1px solid #ccc; padding:1rem; margin:1rem 0; background:white; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+  img.oeuvre-img { max-width:100%; border-radius:5px; margin-bottom:0.5rem; }
+  #collection { background:white; padding:1rem; border-radius:8px; margin-top:2rem; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+  #next { margin-top:1rem; padding:0.5rem 1rem; background:#6a5acd; color:white; border:none; border-radius:5px; cursor:pointer; display:none; }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="assets/LogoAB.png" alt="Logo Apollo Beats">
+  <h1>Apollo Beats</h1>
+  <p>Prototype interactif</p>
+</header>
+
+<main>
+  <h2>Wi-Fi détecté :</h2>
+  <button class="zone-btn" onclick="enterZone('impressionnisme')">SSID: Impressionnisme</button>
+  <button class="zone-btn" onclick="enterZone('moderne')">SSID: Moderne</button>
+
+  <div id="oeuvres-container"></div>
+  <button id="next" onclick="playNext()">Prochaine œuvre</button>
+
+  <div id="collection">
+    <h3>Ma collection</h3>
+    <ul id="collection-list"></ul>
+  </div>
+</main>
+
+<script>
+const zones = {
+  "impressionnisme": {
+    nom: "Salle Impressionnisme",
+    oeuvres: [
+      { id:"renoir", titre:"Le Bal du Moulin de la Galette", audio:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", image:"https://upload.wikimedia.org/wikipedia/commons/6/6e/Pierre-Auguste_Renoir_-_Bal_du_moulin_de_la_galette.jpg", description:"Renoir, 1876" },
+      { id:"monet", titre:"Impression, Soleil Levant", audio:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", image:"https://upload.wikimedia.org/wikipedia/commons/4/44/Claude_Monet%2C_Impression%2C_soleil_levant.jpg", description:"Monet, 1872" }
+    ]
+  },
+  "moderne": {
+    nom: "Salle Moderne",
+    oeuvres: [
+      { id:"picasso", titre:"Les Demoiselles d'Avignon", audio:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", image:"https://upload.wikimedia.org/wikipedia/en/d/d7/Les_Demoiselles_d%27Avignon.jpg", description:"Picasso, 1907" }
+    ]
+  }
+};
+
+let collection = new Set();
+let currentAudio = null;
+let currentZone = null;
+let currentIndex = 0;
+
+function enterZone(zoneId){
+  currentZone = zones[zoneId];
+  currentIndex = 0;
+  const container = document.getElementById("oeuvres-container");
+  container.innerHTML = `<h2>${currentZone.nom}</h2>`;
+  document.getElementById("next").style.display = "block";
+  playNext();
+}
+
+function playNext(){
+  if(currentIndex >= currentZone.oeuvres.length){
+    alert("Vous avez consulté toutes les œuvres de cette salle !");
+    document.getElementById("next").style.display = "none";
+    return;
+  }
+
+  const oeuvre = currentZone.oeuvres[currentIndex];
+  currentIndex++;
+
+  // Affichage de l’œuvre
+  const container = document.getElementById("oeuvres-container");
+  container.innerHTML = `<h2>${currentZone.nom}</h2>
+    <div class="oeuvre">
+      <h3>${oeuvre.titre}</h3>
+      <img class="oeuvre-img" src="${oeuvre.image}" alt="${oeuvre.titre}">
+      <p>${oeuvre.description}</p>
+    </div>`;
+
+  // Lecture audio
+  if(currentAudio){
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+  }
+  currentAudio = new Audio(oeuvre.audio);
+  currentAudio.play();
+
+  // Ajout à la collection
+  if(!collection.has(oeuvre.id)){
+    collection.add(oeuvre.titre);
+    updateCollection(oeuvre.titre);
+  }
+}
+
+function updateCollection(titre){
+  const list = document.getElementById("collection-list");
+  const li = document.createElement("li");
+  li.textContent = titre;
+  list.appendChild(li);
+}
+</script>
+
+</body>
+</html>
+
