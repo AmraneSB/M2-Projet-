@@ -89,6 +89,22 @@
   .audio-card p{margin:8px 0 14px 0}
   .help{font-size:13px;color:#555;margin-top:8px}
 
+  /* stop button style */
+  .stop-btn {
+    position: fixed;
+    right: 18px;
+    bottom: 110px;
+    background: #ff5c5c;
+    color: white;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 999px;
+    box-shadow: 0 8px 20px rgba(255,92,92,0.18);
+    cursor: pointer;
+    z-index: 90;
+    display: none;
+  }
+
   /* responsive tweaks */
   @media (max-width:520px){
     .grid{grid-template-columns:1fr}
@@ -110,14 +126,14 @@
 
   <!-- right controls -->
   <div style="margin-left:auto;display:flex;gap:8px">
-    <button class="btn small" id="simulateBtn" title="Simuler détection Wi-Fi">Simuler Wi-Fi</button>
+    <button class="btn small" id="simulateBtn" title="Simuler détection Wi-Fi">Simuler Wi‑Fi</button>
     <button class="btn small" id="openCollectionBtn" title="Voir ma collection">Collection</button>
   </div>
 </header>
 
 <main>
   <!-- automatic detection message -->
-  <div id="status" style="text-align:center;margin-top:12px;color:#333;font-size:14px">En attente de détection Wi-Fi…</div>
+  <div id="status" style="text-align:center;margin-top:12px;color:#333;font-size:14px">En attente de détection Wi‑Fi…</div>
 
   <!-- room title -->
   <div class="room-title fade-in" id="roomTitle" style="display:none">
@@ -137,6 +153,9 @@
   </div>
 </main>
 
+<!-- STOP button -->
+<button id="stopBtn" class="stop-btn" title="Arrêter l'audio" onclick="stopCurrentAudio()">■ Stop</button>
+
 <!-- Audio permission overlay (browser autoplay policy) -->
 <div id="audioOverlay" class="audio-overlay" style="display:none">
   <div class="audio-card">
@@ -148,14 +167,15 @@
 </div>
 
 <script>
-/* ---------- Prototype data (3 salles) ---------- */
+/* ---------- Prototype data (3 salles, 3 oeuvres each) ---------- */
 const ROOMS = {
   impressionnisme: {
     id: 'impressionnisme',
     name: 'Salle Impressionnisme',
     artworks: [
       { id:'renoir', title:'Bal du Moulin de la Galette — Renoir', img:'https://upload.wikimedia.org/wikipedia/commons/6/6e/Pierre-Auguste_Renoir_-_Bal_du_moulin_de_la_galette.jpg', audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-      { id:'monet', title:'Impression, Soleil Levant — Monet', img:'https://upload.wikimedia.org/wikipedia/commons/4/44/Claude_Monet%2C_Impression%2C_soleil_levant.jpg', audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' }
+      { id:'monet', title:'Impression, Soleil Levant — Monet', img:'https://upload.wikimedia.org/wikipedia/commons/4/44/Claude_Monet%2C_Impression%2C_soleil_levant.jpg', audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+      { id:'manet', title:'Olympia — Manet', img:'https://upload.wikimedia.org/wikipedia/commons/9/9e/Edouard_Manet_-_Olympia_-_Google_Art_Project_2.jpg', audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' }
     ]
   },
   modernisme: {
@@ -163,7 +183,8 @@ const ROOMS = {
     name: 'Salle Modernisme',
     artworks: [
       { id:'picasso', title:"Les Demoiselles d'Avignon — Picasso", img:'https://upload.wikimedia.org/wikipedia/en/d/d7/Les_Demoiselles_d%27Avignon.jpg', audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
-      { id:'delaunay', title:'Carré — Robert Delaunay', img:'https://upload.wikimedia.org/wikipedia/commons/5/5a/Robert_Delaunay%2C_1912-13%2C_Carr%C3%A9_1912-13.jpg', audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' }
+      { id:'delaunay', title:'Carré — Robert Delaunay', img:'https://upload.wikimedia.org/wikipedia/commons/5/5a/Robert_Delaunay%2C_1912-13%2C_Carr%C3%A9_1912-13.jpg', audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+      { id:'kandinsky', title:'Composition VIII — Kandinsky', img:'https://upload.wikimedia.org/wikipedia/commons/6/6e/Kandinsky_-_Composition_8.jpg', audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' }
     ]
   },
   sculpture: {
@@ -171,7 +192,8 @@ const ROOMS = {
     name:'Salle Sculpture & Photo',
     artworks:[
       { id:'rodin', title:'Le Penseur — Rodin', img:'https://upload.wikimedia.org/wikipedia/commons/8/83/Le_Penseur_Rodin.jpg', audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
-      { id:'man_ray', title:'Noir et Blanc — Man Ray', img:'https://upload.wikimedia.org/wikipedia/commons/3/34/Man_Ray_%281885-1976%29_-_Flatiron_Building%2C_New_York%2C_1928.jpg', audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' }
+      { id:'man_ray', title:'Noir et Blanc — Man Ray', img:'https://upload.wikimedia.org/wikipedia/commons/3/34/Man_Ray_%281885-1976%29_-_Flatiron_Building%2C_New_York%2C_1928.jpg', audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
+      { id:'brancusi', title:'Le Baiser — Brancusi', img:'https://upload.wikimedia.org/wikipedia/commons/0/02/Brancusi_Baiser.jpg', audio:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' }
     ]
   }
 };
@@ -194,6 +216,7 @@ const simulateBtn = document.getElementById('simulateBtn');
 const audioOverlay = document.getElementById('audioOverlay');
 const enableSoundBtn = document.getElementById('enableSound');
 const openCollectionBtn = document.getElementById('openCollectionBtn');
+const stopBtn = document.getElementById('stopBtn');
 
 /* ---------- Helpers ---------- */
 function saveState(){
@@ -201,8 +224,8 @@ function saveState(){
   localStorage.setItem('ab_visited', JSON.stringify(Array.from(visited)));
 }
 
+/* transition tone using WebAudio */
 function playTransitionTone(duration=120, freq=880, vol=0.15){
-  // small transition "ping" using WebAudio (no external file)
   if(!transitionAllowed) return;
   try{
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -253,16 +276,13 @@ function renderRoom(room){
 
     // click card or Play button -> play
     card.addEventListener('click', (e)=>{
-      // avoid double triggering when clicking the fav icon
       const favBtn = e.target.closest('button[data-art]');
       const playBtn = e.target.closest('button[data-play]');
       if(favBtn){ toggleFav(favBtn.getAttribute('data-art')); e.stopPropagation(); return; }
       if(playBtn){ playArtworkById(playBtn.getAttribute('data-play')); e.stopPropagation(); return; }
-      // otherwise clicking the card plays first artwork fallback
       playArtworkById(art.id);
     });
 
-    // keyboard accessibility: enter/space to play
     card.addEventListener('keydown', (ev)=>{
       if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); playArtworkById(art.id); }
     });
@@ -283,6 +303,8 @@ function stopCurrentAudio(){
     }catch(e){}
     currentAudio = null;
   }
+  // hide stop button
+  stopBtn.style.display = 'none';
 }
 
 /* Play artwork by id (stops previous audio automatically) */
@@ -295,7 +317,7 @@ function playArtworkById(id){
     return;
   }
 
-  // play small transition tone then play main audio after short delay
+  // play small transition tone
   playTransitionTone(90,1200,0.08);
 
   // stop old audio
@@ -304,11 +326,19 @@ function playArtworkById(id){
   // create new audio and play
   currentAudio = new Audio(art.audio);
   currentAudio.preload = 'auto';
-  currentAudio.addEventListener('canplaythrough', ()=>{ currentAudio.play().catch(()=>{/* autoplay blocked */}); });
-  currentAudio.addEventListener('ended', ()=>{ currentAudio = null; });
+  currentAudio.addEventListener('canplaythrough', ()=>{ 
+    currentAudio.play().catch(()=>{/* autoplay blocked */}); 
+  });
+  currentAudio.addEventListener('ended', ()=>{ 
+    currentAudio = null; 
+    stopBtn.style.display = 'none';
+  });
+
+  // show stop button
+  stopBtn.style.display = 'block';
+
   // mark visited & update UI
   visited.add(art.id); saveState(); renderCollection();
-  // subtle UI feedback: highlight the card briefly
   flashArtworkCard(id);
 }
 
@@ -375,13 +405,15 @@ function renderCollection(){
 
 /* ---------- Simulate Wi-Fi detection ---------- */
 function simulateDetection(){
-  status.textContent = 'Détection Wi-Fi en cours…';
+  status.textContent = 'Détection Wi‑Fi en cours…';
   // small UX delay
   setTimeout(()=>{
     // pick a random room
     const keys = Object.keys(ROOMS);
     const choice = keys[Math.floor(Math.random()*keys.length)];
     renderRoom(ROOMS[choice]);
+    // scroll to top to show room
+    window.scrollTo({top:0,behavior:'smooth'});
   }, 700);
 }
 
@@ -413,20 +445,14 @@ enableSoundBtn.addEventListener('click', ()=>{
 
 /* On first load: show overlay so user can allow audio if they want automatic playback */
 window.addEventListener('load', ()=>{
-  // if there's already visited or user clicks quickly, it's ok; still show overlay to enable sounds
   audioOverlay.style.display = 'flex';
   renderCollection();
 });
 
-/* Optional: auto simulate detection shortly after user enables sound (for demo) */
-audioOverlay.addEventListener('transitionend', ()=>{ /* noop */ });
-
-/* Accessible: space/enter also enable sound when overlay focused */
-audioOverlay.addEventListener('keydown', (e)=>{ if((e.key==='Enter' || e.key===' ') && document.activeElement===enableSoundBtn) enableSoundBtn.click(); });
-
-/* small helper: expose functions to global for collection buttons */
+/* Expose global functions */
 window.playArtworkById = playArtworkById;
 window.toggleFav = toggleFav;
+window.stopCurrentAudio = stopCurrentAudio;
 
 </script>
 </body>
