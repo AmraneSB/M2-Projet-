@@ -134,6 +134,17 @@
 <main>
   <!-- automatic detection message -->
   <div id="status" style="text-align:center;margin-top:12px;color:#333;font-size:14px">En attente de détection Wi‑Fi…</div>
+  
+<button id="stop" onclick="stopAudio()" style="
+  margin-top:1rem;
+  padding:0.5rem 1rem;
+  background:#ff5c5c;
+  color:white;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+  display:none;
+">Arrêter l'audio</button>
 
   <!-- room title -->
   <div class="room-title fade-in" id="roomTitle" style="display:none">
@@ -457,3 +468,4 @@ window.stopCurrentAudio = stopCurrentAudio;
 </script>
 </body>
 </html>
+
