@@ -3,17 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apollo Beats - Prototype</title>
+<title>Apollo Beats - Prototype Musée</title>
+
 <style>
-  body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f0f0; }
-  header { background:#6a5acd; color:white; text-align:center; padding:1rem; display:flex; flex-direction:column; align-items:center; }
+  body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f7f7f7; }
+  
+  header {
+    background:#6a5acd; 
+    color:white; 
+    text-align:center; 
+    padding:1rem; 
+    display:flex; 
+    flex-direction:column; 
+    align-items:center;
+  }
   header img { width:80px; margin-bottom:0.5rem; }
-  main { padding:1rem; }
-  .zone-btn { margin:0.5rem; padding:0.5rem 1rem; background:#9370db; color:white; border:none; border-radius:5px; cursor:pointer; }
-  .oeuvre { border:1px solid #ccc; padding:1rem; margin:1rem 0; background:white; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
-  img.oeuvre-img { max-width:100%; border-radius:5px; margin-bottom:0.5rem; }
-  #collection { background:white; padding:1rem; border-radius:8px; margin-top:2rem; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
-  #next { margin-top:1rem; padding:0.5rem 1rem; background:#6a5acd; color:white; border:none; border-radius:5px; cursor:pointer; display:none; }
+
+  h2 { text-align:center; margin-top:1.5rem; }
+
+  .grid {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding:1rem;
+  }
+
+  .oeuvre-card {
+    background:white;
+    padding:0.8rem;
+    border-radius:8px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+    cursor:pointer;
+    transition: transform 0.15s;
+  }
+  .oeuvre-card:hover {
+    transform:scale(1.03);
+  }
+  .oeuvre-card img {
+    width:100%;
+    border-radius:6px;
+    margin-bottom:0.5rem;
+  }
+
+  #collection {
+    background:white; 
+    padding:1rem; 
+    margin:1rem;
+    border-radius:8px;
+    box-shadow:0 2px 4px rgba(0,0,0,0.1);
+  }
+
 </style>
 </head>
 <body>
@@ -21,85 +60,73 @@
 <header>
   <img src="assets/LogoAB.png" alt="Logo Apollo Beats">
   <h1>Apollo Beats</h1>
-  <p>Prototype interactif</p>
+  <p>Prototype d'œuvres cliquables</p>
 </header>
 
-<main>
-  <h2>Wi-Fi détecté :</h2>
-  <button class="zone-btn" onclick="enterZone('impressionnisme')">SSID: Impressionnisme</button>
-  <button class="zone-btn" onclick="enterZone('moderne')">SSID: Moderne</button>
+<h2>Œuvres disponibles</h2>
 
-  <div id="oeuvres-container"></div>
-  <button id="next" onclick="playNext()">Prochaine œuvre</button>
-
-  <div id="collection">
-    <h3>Ma collection</h3>
-    <ul id="collection-list"></ul>
+<div class="grid">
+  <!-- Oeuvre 1 -->
+  <div class="oeuvre-card" onclick="playArtwork('renoir')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Pierre-Auguste_Renoir_-_Bal_du_moulin_de_la_galette.jpg">
+    <h4>Renoir — Bal du Moulin de la Galette</h4>
   </div>
-</main>
+
+  <!-- Oeuvre 2 -->
+  <div class="oeuvre-card" onclick="playArtwork('monet')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Claude_Monet%2C_Impression%2C_soleil_levant.jpg">
+    <h4>Monet — Impression, Soleil Levant</h4>
+  </div>
+
+  <!-- Oeuvre 3 -->
+  <div class="oeuvre-card" onclick="playArtwork('picasso')">
+    <img src="https://upload.wikimedia.org/wikipedia/en/d/d7/Les_Demoiselles_d%27Avignon.jpg">
+    <h4>Picasso — Les Demoiselles d’Avignon</h4>
+  </div>
+</div>
+
+<div id="collection">
+  <h3>Ma collection</h3>
+  <ul id="collection-list"></ul>
+</div>
+
 
 <script>
-const zones = {
-  "impressionnisme": {
-    nom: "Salle Impressionnisme",
-    oeuvres: [
-      { id:"renoir", titre:"Le Bal du Moulin de la Galette", audio:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", image:"https://upload.wikimedia.org/wikipedia/commons/6/6e/Pierre-Auguste_Renoir_-_Bal_du_moulin_de_la_galette.jpg", description:"Renoir, 1876" },
-      { id:"monet", titre:"Impression, Soleil Levant", audio:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", image:"https://upload.wikimedia.org/wikipedia/commons/4/44/Claude_Monet%2C_Impression%2C_soleil_levant.jpg", description:"Monet, 1872" }
-    ]
+let currentAudio = null;
+let collection = new Set();
+
+const artworks = {
+  "renoir": {
+    titre: "Bal du Moulin de la Galette",
+    audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
   },
-  "moderne": {
-    nom: "Salle Moderne",
-    oeuvres: [
-      { id:"picasso", titre:"Les Demoiselles d'Avignon", audio:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", image:"https://upload.wikimedia.org/wikipedia/en/d/d7/Les_Demoiselles_d%27Avignon.jpg", description:"Picasso, 1907" }
-    ]
+  "monet": {
+    titre: "Impression, Soleil Levant",
+    audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+  },
+  "picasso": {
+    titre: "Les Demoiselles d'Avignon",
+    audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
   }
 };
 
-let collection = new Set();
-let currentAudio = null;
-let currentZone = null;
-let currentIndex = 0;
+function playArtwork(id){
+  const art = artworks[id];
 
-function enterZone(zoneId){
-  currentZone = zones[zoneId];
-  currentIndex = 0;
-  const container = document.getElementById("oeuvres-container");
-  container.innerHTML = `<h2>${currentZone.nom}</h2>`;
-  document.getElementById("next").style.display = "block";
-  playNext();
-}
-
-function playNext(){
-  if(currentIndex >= currentZone.oeuvres.length){
-    alert("Vous avez consulté toutes les œuvres de cette salle !");
-    document.getElementById("next").style.display = "none";
-    return;
-  }
-
-  const oeuvre = currentZone.oeuvres[currentIndex];
-  currentIndex++;
-
-  // Affichage de l’œuvre
-  const container = document.getElementById("oeuvres-container");
-  container.innerHTML = `<h2>${currentZone.nom}</h2>
-    <div class="oeuvre">
-      <h3>${oeuvre.titre}</h3>
-      <img class="oeuvre-img" src="${oeuvre.image}" alt="${oeuvre.titre}">
-      <p>${oeuvre.description}</p>
-    </div>`;
-
-  // Lecture audio
+  // Stop l'ancien audio
   if(currentAudio){
     currentAudio.pause();
     currentAudio.currentTime = 0;
   }
-  currentAudio = new Audio(oeuvre.audio);
+
+  // Lance le nouvel audio
+  currentAudio = new Audio(art.audio);
   currentAudio.play();
 
-  // Ajout à la collection
-  if(!collection.has(oeuvre.id)){
-    collection.add(oeuvre.titre);
-    updateCollection(oeuvre.titre);
+  // Ajoute à la collection
+  if(!collection.has(id)){
+    collection.add(id);
+    updateCollection(art.titre);
   }
 }
 
@@ -113,4 +140,3 @@ function updateCollection(titre){
 
 </body>
 </html>
-
