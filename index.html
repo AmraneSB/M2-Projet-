@@ -37,6 +37,20 @@
   header h1{font-size:18px;margin:0}
   header p.sub{margin:0;font-size:12px;opacity:0.95}
 
+  /* header right group */
+  .header-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .account-btn{
+    background:rgba(255,255,255,0.12);
+    color:white;border:none;padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:600;
+  }
+  .account-menu{position:relative}
+  .menu-popup{
+    display:none;position:absolute;right:0;top:44px;background:white;color:#222;border-radius:10px;
+    box-shadow:0 10px 30px rgba(10,10,40,0.12);overflow:hidden;min-width:180px;
+  }
+  .menu-popup button{display:block;width:100%;padding:10px;border:none;background:transparent;text-align:left;cursor:pointer}
+  .menu-popup button:hover{background:#f6f6fb}
+
   main{padding:16px;flex:1;max-width:720px;margin:0 auto;width:100%}
 
   /* controls */
@@ -105,12 +119,34 @@
     display: none;
   }
 
+  /* modern login modal (option 2) */
+  .login-modal {
+    position: fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:200;
+    background: linear-gradient(rgba(5,5,8,0.45), rgba(5,5,8,0.45));
+  }
+  .login-card {
+    width:92%; max-width:400px; background:white; border-radius:14px; padding:18px; box-shadow:0 20px 50px rgba(10,10,40,0.25);
+    transform: translateY(6px); animation:cardIn .28s cubic-bezier(.2,.9,.2,1) both;
+  }
+  @keyframes cardIn { from {opacity:0; transform: translateY(16px) scale(.99)} to {opacity:1; transform:none} }
+
+  .login-card h3{margin:0 0 10px 0}
+  .login-row{display:flex;gap:8px;margin-top:8px}
+  .login-input{width:100%;padding:10px;border-radius:10px;border:1px solid #e6e6ee}
+  .login-actions{display:flex;gap:8px;margin-top:12px}
+  .ghost{background:transparent;border:1px solid #ddd;padding:9px;border-radius:10px;cursor:pointer}
+  .primary{background:linear-gradient(90deg,var(--primary),var(--primary-strong));color:white;padding:9px;border-radius:10px;border:none;cursor:pointer;width:100%}
+
   /* responsive tweaks */
   @media (max-width:520px){
     .grid{grid-template-columns:1fr}
     header h1{font-size:16px}
     header img.logo{width:44px;height:44px}
   }
+
+  /* small helper: blurred collection when not connected */
+  .collection.locked{filter:blur(2px) grayscale(.2);opacity:.9;pointer-events:none}
+  .collection-cta{display:flex;gap:8px;align-items:center;margin-top:8px}
 </style>
 </head>
 <body>
@@ -125,26 +161,35 @@
   </div>
 
   <!-- right controls -->
-  <div style="margin-left:auto;display:flex;gap:8px">
-    <button class="btn small" id="simulateBtn" title="Simuler détection Wi-Fi">Simuler Wi‑Fi</button>
+  <div class="header-right">
+    <button class="btn small" id="simulateBtn" title="Simuler détection Wi-Fi">Simuler Wi-Fi</button>
     <button class="btn small" id="openCollectionBtn" title="Voir ma collection">Collection</button>
+
+    <!-- Connexion / Compte -->
+    <div class="account-menu">
+      <button id="accountBtn" class="account-btn">Connexion</button>
+      <div id="menuPopup" class="menu-popup" role="menu" aria-hidden="true">
+        <!-- content injected dynamically -->
+      </div>
+    </div>
   </div>
 </header>
 
 <main>
   <!-- automatic detection message -->
-  <div id="status" style="text-align:center;margin-top:12px;color:#333;font-size:14px">En attente de détection Wi‑Fi…</div>
-  
-<button id="stop" onclick="stopAudio()" style="
-  margin-top:1rem;
-  padding:0.5rem 1rem;
-  background:#ff5c5c;
-  color:white;
-  border:none;
-  border-radius:5px;
-  cursor:pointer;
-  display:none;
-">Arrêter l'audio</button>
+  <div id="status" style="text-align:center;margin-top:12px;color:#333;font-size:14px">En attente de détection Wi-Fi…</div>
+
+  <!-- stop button (legacy) -->
+  <button id="stop" onclick="stopAudio()" style="
+    margin-top:1rem;
+    padding:0.5rem 1rem;
+    background:#ff5c5c;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    display:none;
+  ">Arrêter l'audio</button>
 
   <!-- room title -->
   <div class="room-title fade-in" id="roomTitle" style="display:none">
@@ -157,14 +202,19 @@
 
   <!-- bottom collection -->
   <div class="bottom-bar">
-    <div class="collection">
+    <div id="collectionBox" class="collection">
       <h4>Ma collection (favoris + consultées)</h4>
+      <div id="collectionInfo" style="margin:8px 0;color:var(--muted)"></div>
       <ul id="collectionList"></ul>
+      <div id="collectionCTA" class="collection-cta" style="display:none">
+        <div style="color:var(--muted)">Connecte-toi pour sauvegarder et retrouver ta collection sur ton compte.</div>
+        <button id="ctaLogin" class="btn primary" style="margin-left:auto">Connexion</button>
+      </div>
     </div>
   </div>
 </main>
 
-<!-- STOP button -->
+<!-- STOP floating button -->
 <button id="stopBtn" class="stop-btn" title="Arrêter l'audio" onclick="stopCurrentAudio()">■ Stop</button>
 
 <!-- Audio permission overlay (browser autoplay policy) -->
@@ -177,8 +227,24 @@
   </div>
 </div>
 
+<!-- Login modal (modern style) -->
+<div id="loginModal" class="login-modal" aria-hidden="true">
+  <div class="login-card" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <h3 id="loginTitle">Se connecter / Créer un compte</h3>
+    <input id="loginEmail" class="login-input" type="email" placeholder="Email">
+    <input id="loginPassword" class="login-input" type="password" placeholder="Mot de passe">
+    <div class="login-actions">
+      <button id="loginSubmit" class="primary">Se connecter</button>
+      <button id="registerSubmit" class="ghost">Créer un compte</button>
+    </div>
+    <div style="margin-top:10px;text-align:right;">
+      <button id="closeLogin" class="ghost">Fermer</button>
+    </div>
+  </div>
+</div>
+
 <script>
-/* ---------- Prototype data (3 salles, 3 oeuvres each) ---------- */
+/* ---------- Keep your original ROOMS and functionality, extend with login ---------- */
 const ROOMS = {
   impressionnisme: {
     id: 'impressionnisme',
@@ -213,8 +279,15 @@ const ROOMS = {
 let currentRoom = null;
 let currentAudio = null;        // HTMLAudioElement for artwork playback
 let transitionAllowed = false;  // set after user enables audio overlay
-let favorites = new Set(JSON.parse(localStorage.getItem('ab_favs')||'[]'));
-let visited = new Set(JSON.parse(localStorage.getItem('ab_visited')||'[]'));
+
+// local guest sets (used when not logged)
+let guestFavorites = new Set(JSON.parse(localStorage.getItem('ab_favs')||'[]'));
+let guestVisited = new Set(JSON.parse(localStorage.getItem('ab_visited')||'[]'));
+
+// users stored in localStorage under key 'ab_users'
+// structure: { "email@example.com": { password: "...", favorites: [...], visited: [...] } }
+let USERS = JSON.parse(localStorage.getItem('ab_users') || '{}');
+let currentUser = localStorage.getItem('ab_current') || null; // email or null
 
 /* ---------- DOM refs ---------- */
 const grid = document.getElementById('grid');
@@ -229,13 +302,51 @@ const enableSoundBtn = document.getElementById('enableSound');
 const openCollectionBtn = document.getElementById('openCollectionBtn');
 const stopBtn = document.getElementById('stopBtn');
 
-/* ---------- Helpers ---------- */
-function saveState(){
-  localStorage.setItem('ab_favs', JSON.stringify(Array.from(favorites)));
-  localStorage.setItem('ab_visited', JSON.stringify(Array.from(visited)));
+const accountBtn = document.getElementById('accountBtn');
+const menuPopup = document.getElementById('menuPopup');
+
+const loginModal = document.getElementById('loginModal');
+const loginEmail = document.getElementById('loginEmail');
+const loginPassword = document.getElementById('loginPassword');
+const loginSubmit = document.getElementById('loginSubmit');
+const registerSubmit = document.getElementById('registerSubmit');
+const closeLogin = document.getElementById('closeLogin');
+const collectionBox = document.getElementById('collectionBox');
+const collectionInfo = document.getElementById('collectionInfo');
+const collectionCTA = document.getElementById('collectionCTA');
+const ctaLogin = document.getElementById('ctaLogin');
+
+/* ---------- Helpers: storage & users ---------- */
+function persistUsers(){ localStorage.setItem('ab_users', JSON.stringify(USERS)); }
+function setCurrentUser(email){
+  currentUser = email;
+  if(email) localStorage.setItem('ab_current', email);
+  else localStorage.removeItem('ab_current');
+  updateAccountUI();
+  renderCollection();
 }
 
-/* transition tone using WebAudio */
+/* get favorites for active context (user if logged, else guest) */
+function getFavoritesSet(){
+  if(currentUser && USERS[currentUser]) return new Set(USERS[currentUser].favorites || []);
+  return new Set(Array.from(guestFavorites));
+}
+function getVisitedSet(){
+  if(currentUser && USERS[currentUser]) return new Set(USERS[currentUser].visited || []);
+  return new Set(Array.from(guestVisited));
+}
+
+/* save favorites/visited back to storage for current context */
+function saveFavoritesSet(set){
+  if(currentUser && USERS[currentUser]){ USERS[currentUser].favorites = Array.from(set); persistUsers(); }
+  else { guestFavorites = new Set(Array.from(set)); localStorage.setItem('ab_favs', JSON.stringify(Array.from(guestFavorites))); }
+}
+function saveVisitedSet(set){
+  if(currentUser && USERS[currentUser]){ USERS[currentUser].visited = Array.from(set); persistUsers(); }
+  else { guestVisited = new Set(Array.from(set)); localStorage.setItem('ab_visited', JSON.stringify(Array.from(guestVisited))); }
+}
+
+/* ---------- Helpers: misc ---------- */
 function playTransitionTone(duration=120, freq=880, vol=0.15){
   if(!transitionAllowed) return;
   try{
@@ -250,7 +361,7 @@ function playTransitionTone(duration=120, freq=880, vol=0.15){
   }catch(e){ console.warn('WebAudio not available', e) }
 }
 
-/* ---------- UI rendering ---------- */
+/* ---------- UI rendering (artworks) ---------- */
 function renderRoom(room){
   currentRoom = room;
   playTransitionTone(); // fx when arriving in a room
@@ -259,6 +370,8 @@ function renderRoom(room){
   roomTitle.style.display = 'flex';
   status.style.display = 'none';
   grid.innerHTML = '';
+
+  const favSet = getFavoritesSet();
 
   room.artworks.forEach(art => {
     const card = document.createElement('div');
@@ -275,7 +388,7 @@ function renderRoom(room){
           <div class="muted">Cliquer pour écouter</div>
           <div style="display:flex;gap:6px;align-items:center">
             <button class="icon-btn" title="Favoris" data-art="${art.id}" aria-label="Favoris">
-              ${favorites.has(art.id) ? starSvg(true) : starSvg(false)}
+              ${favSet.has(art.id) ? starSvg(true) : starSvg(false)}
             </button>
             <button class="icon-btn" title="Écouter" data-play="${art.id}" aria-label="Écouter">
               ${playSvg()}
@@ -294,6 +407,7 @@ function renderRoom(room){
       playArtworkById(art.id);
     });
 
+    // keyboard accessibility: enter/space to play
     card.addEventListener('keydown', (ev)=>{
       if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); playArtworkById(art.id); }
     });
@@ -316,6 +430,9 @@ function stopCurrentAudio(){
   }
   // hide stop button
   stopBtn.style.display = 'none';
+  // legacy stop button
+  const stopLegacy = document.getElementById('stop');
+  if(stopLegacy) stopLegacy.style.display = 'none';
 }
 
 /* Play artwork by id (stops previous audio automatically) */
@@ -343,13 +460,21 @@ function playArtworkById(id){
   currentAudio.addEventListener('ended', ()=>{ 
     currentAudio = null; 
     stopBtn.style.display = 'none';
+    const stopLegacy = document.getElementById('stop');
+    if(stopLegacy) stopLegacy.style.display = 'none';
   });
 
   // show stop button
   stopBtn.style.display = 'block';
+  const stopLegacy = document.getElementById('stop');
+  if(stopLegacy) stopLegacy.style.display = 'inline-block';
 
-  // mark visited & update UI
-  visited.add(art.id); saveState(); renderCollection();
+  // mark visited & update UI (store into correct user or guest)
+  const visitedSet = getVisitedSet();
+  visitedSet.add(art.id);
+  saveVisitedSet(visitedSet);
+  renderCollection();
+
   flashArtworkCard(id);
 }
 
@@ -372,10 +497,12 @@ function flashArtworkCard(id){
   }
 }
 
-/* ---------- Favorites & Collection ---------- */
+/* ---------- Favorites & Collection (per-user) ---------- */
 function toggleFav(id){
-  if(favorites.has(id)) favorites.delete(id); else favorites.add(id);
-  saveState();
+  const favSet = getFavoritesSet();
+  if(favSet.has(id)) favSet.delete(id); else favSet.add(id);
+  // save back
+  saveFavoritesSet(favSet);
   renderRoom(currentRoom);
   renderCollection();
 }
@@ -383,11 +510,25 @@ function toggleFav(id){
 /* render collection list (favorites first) */
 function renderCollection(){
   collectionList.innerHTML = '';
+  const favSet = getFavoritesSet();
+  const visitedSet = getVisitedSet();
+
+  // update collection box UI depending on login
+  if(!currentUser){
+    collectionBox.classList.add('locked');
+    collectionInfo.textContent = "Connecte-toi pour sauvegarder et retrouver ta collection.";
+    collectionCTA.style.display = 'flex';
+  } else {
+    collectionBox.classList.remove('locked');
+    collectionInfo.textContent = `Connecté en tant que ${currentUser}`;
+    collectionCTA.style.display = 'none';
+  }
+
   // favorites
-  if(favorites.size>0){
+  if(favSet.size>0){
     const favHeader = document.createElement('li'); favHeader.textContent = 'Favoris'; favHeader.style.fontWeight='700';
     collectionList.appendChild(favHeader);
-    for(const id of favorites){
+    for(const id of favSet){
       const art = findArtwork(id);
       if(!art) continue;
       const li = document.createElement('li');
@@ -396,7 +537,7 @@ function renderCollection(){
     }
   }
   // visited (but not in favorites)
-  const otherVisited = [...visited].filter(id=>!favorites.has(id));
+  const otherVisited = [...visitedSet].filter(id=>!favSet.has(id));
   if(otherVisited.length>0){
     const header = document.createElement('li'); header.textContent = 'Consultées'; header.style.fontWeight='700'; header.style.marginTop='8px';
     collectionList.appendChild(header);
@@ -409,14 +550,36 @@ function renderCollection(){
     });
   }
 
-  if(favorites.size===0 && otherVisited.length===0){
+  if(favSet.size===0 && otherVisited.length===0){
     const li = document.createElement('li'); li.textContent = 'Aucune œuvre pour le moment. Cliquez sur une œuvre pour l’écouter.'; collectionList.appendChild(li);
+  }
+}
+
+/* save helpers for favorites/visited */
+function saveFavoritesSet(set){
+  if(currentUser){
+    if(!USERS[currentUser]) USERS[currentUser] = { password:'', favorites:[], visited:[] };
+    USERS[currentUser].favorites = Array.from(set);
+    persistUsers();
+  } else {
+    guestFavorites = new Set(Array.from(set));
+    localStorage.setItem('ab_favs', JSON.stringify(Array.from(guestFavorites)));
+  }
+}
+function saveVisitedSet(set){
+  if(currentUser){
+    if(!USERS[currentUser]) USERS[currentUser] = { password:'', favorites:[], visited:[] };
+    USERS[currentUser].visited = Array.from(set);
+    persistUsers();
+  } else {
+    guestVisited = new Set(Array.from(set));
+    localStorage.setItem('ab_visited', JSON.stringify(Array.from(guestVisited)));
   }
 }
 
 /* ---------- Simulate Wi-Fi detection ---------- */
 function simulateDetection(){
-  status.textContent = 'Détection Wi‑Fi en cours…';
+  status.textContent = 'Détection Wi-Fi en cours…';
   // small UX delay
   setTimeout(()=>{
     // pick a random room
@@ -443,6 +606,95 @@ function playSvg(){
   return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M5 3v18l15-9z" fill="#6a5acd"/></svg>`;
 }
 
+/* ---------- Account / Login logic ---------- */
+/* show account menu or login depending on state */
+function updateAccountUI(){
+  if(currentUser && USERS[currentUser]){
+    accountBtn.textContent = currentUser;
+    menuPopup.innerHTML = `
+      <button onclick="viewProfile()">Mon compte</button>
+      <button onclick="logout()">Se déconnecter</button>
+    `;
+    menuPopup.style.display = 'none';
+    menuPopup.setAttribute('aria-hidden','true');
+  } else {
+    accountBtn.textContent = 'Connexion';
+    menuPopup.innerHTML = `<button onclick="openLoginModal()">Se connecter / Créer un compte</button>`;
+    menuPopup.style.display = 'none';
+    menuPopup.setAttribute('aria-hidden','true');
+  }
+}
+
+/* toggle menu */
+accountBtn.addEventListener('click', ()=>{
+  if(menuPopup.style.display === 'block'){ menuPopup.style.display = 'none'; menuPopup.setAttribute('aria-hidden','true'); }
+  else { menuPopup.style.display = 'block'; menuPopup.setAttribute('aria-hidden','false'); }
+});
+
+/* open login modal */
+function openLoginModal(){
+  loginModal.style.display = 'flex';
+  loginModal.setAttribute('aria-hidden','false');
+  menuPopup.style.display = 'none';
+  menuPopup.setAttribute('aria-hidden','true');
+}
+
+/* close login */
+closeLogin.addEventListener('click', ()=>{
+  loginModal.style.display = 'none';
+  loginModal.setAttribute('aria-hidden','true');
+});
+
+/* login & register handlers */
+loginSubmit.addEventListener('click', ()=>{
+  const email = (loginEmail.value || '').trim().toLowerCase();
+  const pass = (loginPassword.value || '').trim();
+  if(!email || !pass){ alert('Email et mot de passe requis'); return; }
+  if(!USERS[email]){ alert('Compte introuvable. Créez un compte.'); return; }
+  if(USERS[email].password !== pass){ alert('Mot de passe incorrect'); return; }
+  // successful login
+  setCurrentUser(email);
+  loginModal.style.display = 'none';
+  loginModal.setAttribute('aria-hidden','true');
+  // ensure sets exist
+  USERS[email].favorites = USERS[email].favorites || [];
+  USERS[email].visited = USERS[email].visited || [];
+  persistUsers();
+  renderRoom(currentRoom || ROOMS[Object.keys(ROOMS)[0]]);
+  alert('Connecté en tant que ' + email);
+});
+
+registerSubmit.addEventListener('click', ()=>{
+  const email = (loginEmail.value || '').trim().toLowerCase();
+  const pass = (loginPassword.value || '').trim();
+  if(!email || !pass){ alert('Email et mot de passe requis'); return; }
+  if(USERS[email]){ alert('Ce compte existe déjà'); return; }
+  USERS[email] = { password: pass, favorites: Array.from(guestFavorites), visited: Array.from(guestVisited) };
+  persistUsers();
+  setCurrentUser(email);
+  loginModal.style.display = 'none';
+  loginModal.setAttribute('aria-hidden','true');
+  alert('Compte créé et connecté : ' + email);
+});
+
+/* view profile (simple) */
+function viewProfile(){
+  menuPopup.style.display = 'none';
+  menuPopup.setAttribute('aria-hidden','true');
+  alert('Profil: ' + currentUser + '\nFavoris: ' + JSON.stringify(USERS[currentUser].favorites || []) );
+}
+
+/* logout */
+function logout(){
+  setCurrentUser(null);
+  alert('Déconnecté');
+}
+
+/* CTA login button in collection area */
+ctaLogin.addEventListener('click', ()=>{
+  openLoginModal();
+});
+
 /* ---------- keyboard + UI wiring ---------- */
 simulateBtn.addEventListener('click', simulateDetection);
 openCollectionBtn.addEventListener('click', ()=>{ window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}); });
@@ -457,10 +709,13 @@ enableSoundBtn.addEventListener('click', ()=>{
 /* On first load: show overlay so user can allow audio if they want automatic playback */
 window.addEventListener('load', ()=>{
   audioOverlay.style.display = 'flex';
+  // restore current user if any
+  if(currentUser && !USERS[currentUser]){ currentUser = null; localStorage.removeItem('ab_current'); }
+  updateAccountUI();
   renderCollection();
 });
 
-/* Expose global functions */
+/* expose a couple helpers for buttons created dynamically */
 window.playArtworkById = playArtworkById;
 window.toggleFav = toggleFav;
 window.stopCurrentAudio = stopCurrentAudio;
@@ -468,4 +723,3 @@ window.stopCurrentAudio = stopCurrentAudio;
 </script>
 </body>
 </html>
-
