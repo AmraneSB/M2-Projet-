@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Paris Wi-Fi Public</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #2c3e50; /* Fond gris foncé style bureau */
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .phone-case {
+            width: 375px;
+            height: 750px;
+            background-color: #000;
+            border-radius: 40px;
+            padding: 15px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            border-radius: 30px;
+            overflow: hidden; 
+            position: relative;
+        }
+
+        .wifi-page {
+            background-color: #004d99; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%; 
+            color: white;
+            text-align: center;
+        }
+        
+        .wifi-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 300px;
+            color: #333;
+        }
+
+        .btn-wifi {
+            background-color: #00cc00;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .modal-overlay {
+            position: absolute; 
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none; 
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            border-radius: 30px;
+        }
+
+        .modal-content {
+            background: white;
+            width: 85%;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: popUpAnim 0.3s ease-out;
+        }
+
+        @keyframes popUpAnim {
+            from {transform: scale(0.7); opacity: 0;}
+            to {transform: scale(1); opacity: 1;}
+        }
+
+        .apollo-logo-text {
+            color: #6C63FF;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .play-btn {
+            background-color: #6C63FF;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-case">
+        <div class="phone-screen">
+
+            <div class="wifi-page">
+    <h1>PARIS WI-FI</h1>
+    
+    <div class="wifi-box">
+        <img src="assets/LogoAB.png" alt="Logo Apollo" style="width: 80px; margin-bottom: 15px;">
+        <p>Bienvenue sur le réseau public.</p>
+        <p><small>Veuillez vous connecter pour accéder à internet.</small></p>
+        <button class="btn-wifi" onclick="openPopup()">ME CONNECTER</button>
+    </div>
+</div>
+
+            <div id="promoModal" class="modal-overlay">
+                <div class="modal-content">
+    <img src="assets/LogoAB.png" alt="Apollo Beats" style="width: 100px; margin-bottom: 10px;">
+    
+    <span class="apollo-logo-text">Apollo Beats 🎧</span>
+    <h2>Enrichissez votre visite !</h2>
+    <p>Découvrez les œuvres autour de vous grâce à notre guide audio intelligent.</p>
+    
+    <button class="play-btn" onclick="window.location.href='visite.html'">
+        Découvrir l'expérience
+    </button>
+    
+    <br><br>
+    <a href="#" onclick="alert('Bon tant pis...')" style="color:#999; text-decoration:none; font-size:12px;">Non merci, juste le Wi-Fi</a>
+</div>
+            </div>
+            </div>
+    </div>
+    <script>
+        function openPopup() {
+            document.querySelector('.btn-wifi').innerHTML = "Connexion...";
+            setTimeout(() => {
+                document.getElementById('promoModal').style.display = 'flex';
+            }, 800);
+        }
+    </script>
+</body>
+</html>
