@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Apollo Beats - Visite</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div class="phone-case">
+        <div class="phone-screen">
+
+            <header class="artwork-header">
+    <img src="assets/LogoAB.png" alt="Logo" style="height: 30px; object-fit: contain;">
+    
+    <span class="artwork-category" style="margin-left: 10px;">Impressionnisme</span>
+    
+    <span class="close-btn" onclick="window.location.href='index.html'">✕</span>
+</header>
+
+            <main class="page-visite">
+                <section class="artwork-image-container">
+                    <img src="assets/oeuvre-renoir.jpg" alt="Le Bal du moulin de la Galette" class="artwork-image">
+                </section>
+
+                <section class="artwork-details">
+                    <h2>Le Bal du moulin</h2>
+                    <p class="artist-name">Pierre-Auguste Renoir, 1876</p>
+                </section>
+                
+                <section class="audio-player-controls">
+                    <audio id="audioPlayer" src="assets/mp3/guide-renoir.mp3" preload="auto"></audio>
+                    
+                    <button id="playPauseBtn" class="play-btn" onclick="togglePlayPause()">
+                        ▶️ Écouter la description
+                    </button>
+
+                    <div class="progress-bar-container">
+                        <div id="progressBar" class="progress-bar"></div>
+                    </div>
+                    <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
+                </section>
+
+                <section class="text-description">
+                    <h3>Description complète</h3>
+                    <p>
+                        Le Bal du moulin de la Galette (1876) de Renoir représente un après-midi animé à Montmartre...
+                        (Le texte continue...)
+                    </p>
+                    <br><br>
+                    <button onclick="window.location.href='profil.html'" style="background:#eee; color:#333; border:none; padding:10px 20px; width:100%; border-radius:5px; cursor:pointer; margin-bottom: 20px;">
+                        Voir mon profil & collection
+                    </button>
+                </section>
+            </main>
+
+            <nav class="bottom-bar">
+                <div onclick="window.location.href='index.html'">🏠</div>
+                <div style="color:#6C63FF; font-weight: bold;">🎧</div> <div onclick="window.location.href='profil.html'">👤</div>
+            </nav>
+
+        </div>
+    </div> 
+    <script>
+        const audio = document.getElementById('audioPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const progressBar = document.getElementById('progressBar');
+        const currentTimeSpan = document.getElementById('currentTime');
+        const durationSpan = document.getElementById('duration');
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                audio.play();
+                playPauseBtn.innerHTML = '⏸️ Pause';
+                console.log("ADN Culturel: Impressionnisme +1");
+            }, 1000); 
+
+            audio.onloadedmetadata = () => {
+                durationSpan.textContent = formatTime(audio.duration);
+            };
+        });
+
+        function togglePlayPause() {
+            if (audio.paused) {
+                audio.play();
+                playPauseBtn.innerHTML = '⏸️ Pause';
+            } else {
+                audio.pause();
+                playPauseBtn.innerHTML = '▶️ Écouter la description';
+            }
+        }
+
+        audio.ontimeupdate = () => {
+            if(audio.duration) {
+                const progress = (audio.currentTime / audio.duration) * 100;
+                progressBar.style.width = progress + '%';
+                currentTimeSpan.textContent = formatTime(audio.currentTime);
+            }
+        };
+        
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+    </script>
+</body>
+</html>
