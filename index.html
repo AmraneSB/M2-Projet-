@@ -13,6 +13,7 @@
     --muted:#6b6b80;
     --accent:#ffcc00;
     --radius:12px;
+    --sidebar-width:300px;
   }
 
   /* Dark theme variables (manual toggle will add .dark on body) */
@@ -38,22 +39,24 @@
   /* Header */
   header.appbar{
     background:linear-gradient(180deg,var(--primary),var(--primary-strong));
-    color:white;padding:14px 16px;display:flex;align-items:center;gap:12px;
-    position:sticky;top:0;z-index:50;box-shadow:0 6px 20px rgba(106,90,205,0.12);
+    color:white;padding:12px 16px;display:flex;align-items:center;gap:12px;
+    position:sticky;top:0;z-index:80;box-shadow:0 6px 20px rgba(106,90,205,0.12);
   }
   header .brand{display:flex;align-items:center;gap:12px;}
-  header img.logo{height:48px;object-fit:cover}
+  header img.logo{height:44px;object-fit:cover}
   header h1{font-size:18px;margin:0}
   header p.sub{margin:0;font-size:12px;opacity:0.95}
 
+  .header-left { display:flex; align-items:center; gap:12px; }
   .header-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .icon-btn-small{background:transparent;border:none;color:white;font-size:18px;cursor:pointer;padding:6px;border-radius:8px}
   .account-btn{background:rgba(255,255,255,0.12); color:white;border:none;padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:600;}
   .account-menu{position:relative}
   .menu-popup{display:none;position:absolute;right:0;top:44px;background:white;color:#222;border-radius:10px;box-shadow:0 10px 30px rgba(10,10,40,0.12);overflow:hidden;min-width:180px;}
   .menu-popup button{display:block;width:100%;padding:10px;border:none;background:transparent;text-align:left;cursor:pointer}
   .menu-popup button:hover{background:#f6f6fb}
 
-  main{padding:16px;flex:1;max-width:720px;margin:0 auto;width:100%}
+  main{padding:16px;flex:1;max-width:820px;margin:0 auto;width:100%}
 
   /* controls */
   .controls{display:flex;gap:8px;justify-content:center;margin-top:12px;margin-bottom:16px}
@@ -158,16 +161,48 @@
 
   /* small theme toggle */
   .theme-toggle { font-size:14px; }
+
+  /* ---------------- SIDEBAR ---------------- */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: calc(-1 * var(--sidebar-width));
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--card);
+    box-shadow: 6px 0 40px rgba(0,0,0,0.08);
+    z-index:200;
+    transition: left 240ms cubic-bezier(.2,.9,.2,1);
+    padding:12px;
+    overflow-y:auto;
+  }
+  .sidebar.open { left: 0; }
+  .sidebar h3 { margin:8px 0; font-size:16px; }
+  .sidebar .nav { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+  .sidebar .nav button { text-align:left; background:transparent; border:none; padding:8px; border-radius:8px; cursor:pointer; color:var(--primary); font-weight:600; }
+  .sidebar .fav-list { margin-top:8px; }
+  .sidebar .fav-item { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 8px; border-radius:8px; background:transparent;}
+  .sidebar .fav-item button { background:transparent; border:none; cursor:pointer; color:var(--muted); }
+  .sidebar .close-btn { position:absolute; right:8px; top:8px; background:transparent; border:none; cursor:pointer; font-size:18px; color:var(--muted); }
+
+  /* overlay when sidebar open (mobile) */
+  .sidebar-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.25); z-index:150; display:none;
+  }
+  .sidebar-overlay.visible { display:block; }
 </style>
 </head>
 <body>
 
 <header class="appbar">
-  <div class="brand">
-    <img class="logo" src="assets/LogoAB.png" alt="Logo Apollo Beats" onerror="this.style.opacity=0.6">
-    <div>
-      <h1>Apollo Beats</h1>
-      <p class="sub">Prototype — visite guidée intelligente</p>
+  <div class="header-left">
+    <button id="sidebarToggle" class="icon-btn-small" aria-label="Ouvrir menu">☰</button>
+    <div class="brand">
+      <img class="logo" src="assets/LogoAB.png" alt="Logo Apollo Beats" onerror="this.style.opacity=0.6">
+      <div>
+        <h1>Apollo Beats</h1>
+        <p class="sub">Prototype — visite guidée intelligente</p>
+      </div>
     </div>
   </div>
 
@@ -186,6 +221,27 @@
     </div>
   </div>
 </header>
+
+<!-- SIDEBAR & overlay -->
+<div id="sidebar" class="sidebar" aria-hidden="true">
+  <button id="sidebarClose" class="close-btn" aria-label="Fermer menu">✕</button>
+  <h3>Menu</h3>
+  <div class="nav" id="sidebarNav">
+    <!-- navigation buttons inserted here -->
+  </div>
+
+  <h3>Favoris</h3>
+  <div class="fav-list" id="sidebarFavs">
+    <!-- favorite items inserted here -->
+  </div>
+
+  <h3>Actions</h3>
+  <div class="nav">
+    <button onclick="openLoginModal()">Se connecter / Créer un compte</button>
+    <button id="sidebarThemeToggle" onclick="toggleTheme()">Basculer thème</button>
+  </div>
+</div>
+<div id="sidebarOverlay" class="sidebar-overlay" tabindex="-1" aria-hidden="true"></div>
 
 <main>
   <div id="status" style="text-align:center;margin-top:12px;color:#333;font-size:14px">
@@ -227,7 +283,7 @@
 <button id="stopBtn" class="stop-btn" title="Arrêter l'audio" onclick="stopCurrentAudio()">■ Stop</button>
 
 <!-- Audio progress -->
-<div id="audioProgress" class="audio-progress">
+<div id="audioProgress" class="audio-progress" aria-hidden="true">
   <div style="width:14px;">🔊</div>
   <progress id="progressBar" value="0" max="100"></progress>
   <div class="time" id="progressTime">0:00</div>
@@ -340,6 +396,13 @@ const audioProgress = document.getElementById('audioProgress');
 const progressBar = document.getElementById('progressBar');
 const progressTime = document.getElementById('progressTime');
 
+const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebarClose = document.getElementById('sidebarClose');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const sidebarNav = document.getElementById('sidebarNav');
+const sidebarFavs = document.getElementById('sidebarFavs');
+
 /* ---------- Helpers: storage & users ---------- */
 function persistUsers(){ localStorage.setItem('ab_users', JSON.stringify(USERS)); }
 function setCurrentUser(email){
@@ -348,6 +411,7 @@ function setCurrentUser(email){
   else localStorage.removeItem('ab_current');
   updateAccountUI();
   renderCollection();
+  renderSidebar(); // ensure favorites panel shows correct state
 }
 
 /* get favorites for active context (user if logged, else guest) */
@@ -364,6 +428,7 @@ function getVisitedSet(){
 function saveFavoritesSet(set){
   if(currentUser && USERS[currentUser]){ USERS[currentUser].favorites = Array.from(set); persistUsers(); }
   else { guestFavorites = new Set(Array.from(set)); localStorage.setItem('ab_favs', JSON.stringify(Array.from(guestFavorites))); }
+  renderSidebar(); // update sidebar when favorites change
 }
 function saveVisitedSet(set){
   if(currentUser && USERS[currentUser]){ USERS[currentUser].visited = Array.from(set); persistUsers(); }
@@ -617,8 +682,10 @@ function toggleFav(id){
   saveFavoritesSet(favSet);
   renderRoom(currentRoom);
   renderCollection();
+  renderSidebar(); // keep sidebar in sync
 }
 
+/* render collection (bottom box) */
 function renderCollection(){
   collectionList.innerHTML = '';
   const favSet = getFavoritesSet();
@@ -674,6 +741,7 @@ function saveFavoritesSet(set){
     guestFavorites = new Set(Array.from(set));
     localStorage.setItem('ab_favs', JSON.stringify(Array.from(guestFavorites)));
   }
+  renderSidebar();
 }
 function saveVisitedSet(set){
   if(currentUser){
@@ -858,6 +926,76 @@ function updateThemeIcon(){
 }
 themeToggle.addEventListener('click', toggleTheme);
 
+/* ---------- SIDEBAR: rendering & actions ---------- */
+function toggleSidebar(open){
+  const shouldOpen = typeof open === 'boolean' ? open : !sidebar.classList.contains('open');
+  if(shouldOpen){
+    sidebar.classList.add('open');
+    sidebar.setAttribute('aria-hidden','false');
+    sidebarOverlay.classList.add('visible');
+    sidebarOverlay.setAttribute('aria-hidden','false');
+  } else {
+    sidebar.classList.remove('open');
+    sidebar.setAttribute('aria-hidden','true');
+    sidebarOverlay.classList.remove('visible');
+    sidebarOverlay.setAttribute('aria-hidden','true');
+  }
+}
+
+sidebarToggle.addEventListener('click', ()=> toggleSidebar(true));
+sidebarClose.addEventListener('click', ()=> toggleSidebar(false));
+sidebarOverlay.addEventListener('click', ()=> toggleSidebar(false));
+sidebarOverlay.addEventListener('keydown', (e)=>{ if(e.key==='Escape') toggleSidebar(false); });
+
+function renderSidebar(){
+  // rooms nav
+  sidebarNav.innerHTML = '';
+  for(const rKey of Object.keys(ROOMS)){
+    const r = ROOMS[rKey];
+    const btn = document.createElement('button');
+    btn.textContent = r.name;
+    btn.onclick = ()=>{ renderRoom(r); toggleSidebar(false); window.scrollTo({top:0,behavior:'smooth'}); };
+    sidebarNav.appendChild(btn);
+  }
+
+  // favorites
+  sidebarFavs.innerHTML = '';
+  const favSet = getFavoritesSet();
+  if(favSet.size===0){
+    const p = document.createElement('div'); p.style.color='var(--muted)'; p.textContent = 'Aucun favori pour le moment';
+    sidebarFavs.appendChild(p);
+  } else {
+    for(const id of favSet){
+      const art = findArtwork(id);
+      if(!art) continue;
+      const row = document.createElement('div'); row.className='fav-item';
+      const left = document.createElement('div'); left.style.flex='1'; left.textContent = art.title;
+      const actions = document.createElement('div');
+
+      const playBtn = document.createElement('button'); playBtn.title='Écouter'; playBtn.innerHTML='▶';
+      playBtn.onclick = ()=>{ playArtworkById(art.id); toggleSidebar(false); };
+
+      const removeBtn = document.createElement('button'); removeBtn.title='Retirer des favoris'; removeBtn.innerHTML='✕';
+      removeBtn.onclick = ()=>{ removeFromFavorites(art.id); };
+
+      actions.appendChild(playBtn);
+      actions.appendChild(removeBtn);
+      row.appendChild(left);
+      row.appendChild(actions);
+      sidebarFavs.appendChild(row);
+    }
+  }
+}
+
+function removeFromFavorites(id){
+  const favSet = getFavoritesSet();
+  if(favSet.has(id)) favSet.delete(id);
+  saveFavoritesSet(favSet);
+  renderRoom(currentRoom);
+  renderCollection();
+  renderSidebar();
+}
+
 /* ---------- Initial load ---------- */
 window.addEventListener('load', ()=>{
   // show overlay once so user can opt-in to audio
@@ -873,7 +1011,10 @@ window.addEventListener('load', ()=>{
   renderRoom(ROOMS[Object.keys(ROOMS)[0]]);
   // apply theme
   applySavedTheme();
+  // render sidebar contents initially
+  renderSidebar();
 });
+
 /* expose helpers globally for inline onclicks */
 window.playArtworkById = playArtworkById;
 window.toggleFav = toggleFav;
