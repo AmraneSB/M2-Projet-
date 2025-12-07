@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mon Profil</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="phone-case">
+        <div class="phone-screen">
+
+            <header class="artwork-header">
+                <span style="width: 24px;"></span> 
+                <span style="font-weight: bold; color: #333;">MON ESPACE</span>
+                <span style="font-size: 20px;">⚙️</span>
+            </header>
+
+            <main>
+                
+                <div class="adn-section" style="text-align: center; margin-bottom: 10px;">
+                    <h3 style="margin-top: 0; color: #6C63FF;">ADN Culturel</h3>
+                    
+                    <div style="
+                        width: 120px; 
+                        height: 120px; 
+                        border-radius: 50%; 
+                        background: conic-gradient(#6C63FF 0% 70%, #ff6b6b 70% 100%); 
+                        margin: 0 auto 15px auto;
+                        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                        position: relative;">
+                        
+                        <div style="position: absolute; top: 20px; left: 20px; width: 80px; height: 80px; background: white; border-radius: 50%;"></div>
+                    </div>
+                    
+                    <p style="font-size: 18px; margin: 5px 0;"><strong>Impressionniste</strong></p>
+                    <p style="color: #888; font-size: 14px; margin: 0;">Basé sur votre parcours (70%)</p>
+                </div>
+
+                <h3 style="padding: 0 20px; margin-bottom: 10px;">Ma Collection (2)</h3>
+                
+                <div class="grid-collection">
+                    
+                    <div class="collection-item" onclick="window.location.href='visite.html'">
+                        <img src="assets/oeuvre-renoir.jpg" alt="Renoir">
+                        <div style="padding: 8px;">
+                            <div style="font-weight: bold; font-size: 14px;">Le Bal</div>
+                            <div style="color: #6C63FF; font-size: 12px;">Renoir</div>
+                        </div>
+                    </div>
+
+                    <div class="collection-item">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1200px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg" alt="Van Gogh">
+                        <div style="padding: 8px;">
+                            <div style="font-weight: bold; font-size: 14px;">Nuit Étoilée</div>
+                            <div style="color: #6C63FF; font-size: 12px;">Van Gogh</div>
+                        </div>
+                    </div>
+
+                    <div class="collection-item" style="opacity: 0.5;">
+                        <div style="height: 80px; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 24px;">🔒</div>
+                        <div style="padding: 8px;">
+                            <div style="font-size: 12px; color: #999;">À découvrir...</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div style="padding: 20px;">
+                    <button class="play-btn" style="background-color: #ff6b6b;" onclick="window.location.href='index.html'">
+                        Déconnexion
+                    </button>
+                </div>
+
+            </main>
+
+            <nav class="bottom-bar">
+                <div onclick="window.location.href='index.html'" style="cursor: pointer; color: #999; font-size: 24px;">
+                    🏠
+                </div>
+                <div onclick="window.location.href='visite.html'" style="cursor: pointer; color: #999; font-size: 24px;">
+                    🎧
+                </div>
+                <div style="color: #6C63FF; font-size: 24px;">
+                    👤
+                </div>
+            </nav>
+
+        </div>
+    </div>
+    </body>
+</html>
