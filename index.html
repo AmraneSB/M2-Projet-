@@ -14,6 +14,17 @@
     --accent:#ffcc00;
     --radius:12px;
   }
+
+  /* Dark theme variables (manual toggle will add .dark on body) */
+  body.dark{
+    --bg:#0b0d12;
+    --primary:#9aa3ff;
+    --primary-strong:#7d6eff;
+    --card:#0f1720;
+    --muted:#98a0b3;
+    --accent:#ffcf66;
+  }
+
   *{box-sizing:border-box}
   body{
     margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
@@ -30,24 +41,15 @@
     color:white;padding:14px 16px;display:flex;align-items:center;gap:12px;
     position:sticky;top:0;z-index:50;box-shadow:0 6px 20px rgba(106,90,205,0.12);
   }
-  header .brand{
-    display:flex;align-items:center;gap:12px;
-  }
+  header .brand{display:flex;align-items:center;gap:12px;}
   header img.logo{height:48px;object-fit:cover}
   header h1{font-size:18px;margin:0}
   header p.sub{margin:0;font-size:12px;opacity:0.95}
 
-  /* header right group */
   .header-right{margin-left:auto;display:flex;gap:8px;align-items:center}
-  .account-btn{
-    background:rgba(255,255,255,0.12);
-    color:white;border:none;padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:600;
-  }
+  .account-btn{background:rgba(255,255,255,0.12); color:white;border:none;padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:600;}
   .account-menu{position:relative}
-  .menu-popup{
-    display:none;position:absolute;right:0;top:44px;background:white;color:#222;border-radius:10px;
-    box-shadow:0 10px 30px rgba(10,10,40,0.12);overflow:hidden;min-width:180px;
-  }
+  .menu-popup{display:none;position:absolute;right:0;top:44px;background:white;color:#222;border-radius:10px;box-shadow:0 10px 30px rgba(10,10,40,0.12);overflow:hidden;min-width:180px;}
   .menu-popup button{display:block;width:100%;padding:10px;border:none;background:transparent;text-align:left;cursor:pointer}
   .menu-popup button:hover{background:#f6f6fb}
 
@@ -55,10 +57,7 @@
 
   /* controls */
   .controls{display:flex;gap:8px;justify-content:center;margin-top:12px;margin-bottom:16px}
-  .btn{
-    background:var(--card);border-radius:999px;padding:8px 12px;border:none;cursor:pointer;
-    box-shadow:0 2px 6px rgba(15,15,30,0.04);font-weight:600;color:var(--primary);
-  }
+  .btn{background:var(--card);border-radius:999px;padding:8px 12px;border:none;cursor:pointer;box-shadow:0 2px 6px rgba(15,15,30,0.04);font-weight:600;color:var(--primary);}
   .btn.primary{background:linear-gradient(90deg,var(--primary),var(--primary-strong));color:white;box-shadow:0 6px 18px rgba(90,64,200,0.16)}
   .small{padding:6px 10px;font-size:14px}
 
@@ -73,7 +72,20 @@
   .card{
     background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 6px 18px rgba(22,22,45,0.05);
     cursor:pointer;display:flex;flex-direction:column;transition:transform .18s ease,box-shadow .18s;
+    position:relative;padding-bottom:6px;
   }
+  .card.playing{box-shadow:0 14px 40px rgba(106,90,205,0.12); transform:translateY(-6px) scale(1.02);}
+  .card .playing-badge{
+    position:absolute;left:10px;top:10px;background:linear-gradient(90deg,var(--primary),var(--primary-strong));
+    color:white;padding:6px 8px;border-radius:999px;font-size:12px;font-weight:700;
+    box-shadow:0 6px 18px rgba(90,64,200,0.18);
+  }
+  .card .consulted {
+    position:absolute; right:10px; top:10px; font-size:12px; font-weight:700; color:var(--accent);
+    background: rgba(255,255,255,0.95); padding:4px 8px; border-radius:999px;
+  }
+  body.dark .card .consulted { background: rgba(0,0,0,0.25); color:var(--accent); }
+
   .card:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(22,22,45,0.08)}
   .thumb{width:100%;height:120px;object-fit:cover;display:block}
   .card .meta{padding:10px}
@@ -83,53 +95,24 @@
 
   /* bottom area */
   .bottom-bar{position:sticky;bottom:12px;margin-top:18px}
-  .collection{
-    background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,255,0.98));
-    border-radius:12px;padding:10px;box-shadow:0 8px 30px rgba(10,10,20,0.06);
-  }
+  .collection{background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,255,0.98));border-radius:12px;padding:10px;box-shadow:0 8px 30px rgba(10,10,20,0.06);}
   .collection h4{margin:0 0 8px 0}
   .collection ul{margin:0;padding:0 12px;max-height:180px;overflow:auto}
   .collection li{list-style:none;padding:8px 0;border-bottom:1px dashed #efefef;font-size:14px}
 
-  /* icons buttons */
   .icon-btn{background:transparent;border:none;cursor:pointer;padding:6px;border-radius:8px}
   .fav-active{color:var(--accent);filter:drop-shadow(0 2px 6px rgba(255,204,0,0.15))}
 
-  /* overlay audio permission */
-  .audio-overlay{
-    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(6,6,12,0.45);z-index:80;
-  }
+  .audio-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(6,6,12,0.45);z-index:80;}
   .audio-card{background:white;padding:18px;border-radius:12px;text-align:center;width:90%;max-width:380px}
   .audio-card p{margin:8px 0 14px 0}
   .help{font-size:13px;color:#555;margin-top:8px}
 
-  /* stop button style */
-  .stop-btn {
-    position: fixed;
-    right: 18px;
-    bottom: 110px;
-    background: #ff5c5c;
-    color: white;
-    border: none;
-    padding: 10px 12px;
-    border-radius: 999px;
-    box-shadow: 0 8px 20px rgba(255,92,92,0.18);
-    cursor: pointer;
-    z-index: 90;
-    display: none;
-  }
+  .stop-btn {position: fixed; right: 18px; bottom: 110px; background: #ff5c5c; color: white; border: none; padding: 10px 12px; border-radius: 999px; box-shadow: 0 8px 20px rgba(255,92,92,0.18); cursor: pointer; z-index: 90; display: none;}
 
-  /* modern login modal (option 2) */
-  .login-modal {
-    position: fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:200;
-    background: linear-gradient(rgba(5,5,8,0.45), rgba(5,5,8,0.45));
-  }
-  .login-card {
-    width:92%; max-width:400px; background:white; border-radius:14px; padding:18px; box-shadow:0 20px 50px rgba(10,10,40,0.25);
-    transform: translateY(6px); animation:cardIn .28s cubic-bezier(.2,.9,.2,1) both;
-  }
+  .login-modal {position: fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:200; background: linear-gradient(rgba(5,5,8,0.45), rgba(5,5,8,0.45));}
+  .login-card {width:92%; max-width:400px; background:white; border-radius:14px; padding:18px; box-shadow:0 20px 50px rgba(10,10,40,0.25); transform: translateY(6px); animation:cardIn .28s cubic-bezier(.2,.9,.2,1) both;}
   @keyframes cardIn { from {opacity:0; transform: translateY(16px) scale(.99)} to {opacity:1; transform:none} }
-
   .login-card h3{margin:0 0 10px 0}
   .login-row{display:flex;gap:8px;margin-top:8px}
   .login-input{width:100%;padding:10px;border-radius:10px;border:1px solid #e6e6ee}
@@ -137,16 +120,44 @@
   .ghost{background:transparent;border:1px solid #ddd;padding:9px;border-radius:10px;cursor:pointer}
   .primary{background:linear-gradient(90deg,var(--primary),var(--primary-strong));color:white;padding:9px;border-radius:10px;border:none;cursor:pointer;width:100%}
 
-  /* responsive tweaks */
-  @media (max-width:520px){
-    .grid{grid-template-columns:1fr}
-    header h1{font-size:16px}
-    header img.logo{height:44px}
-  }
+  @media (max-width:520px){ .grid{grid-template-columns:1fr} header h1{font-size:16px} header img.logo{height:44px} }
 
-  /* small helper: blurred collection when not connected */
   .collection.locked{filter:blur(2px) grayscale(.2);opacity:.9;pointer-events:none}
   .collection-cta{display:flex;gap:8px;align-items:center;margin-top:8px}
+
+  /* small network status */
+  #status small{display:block;color:var(--muted);font-size:12px;margin-top:6px}
+
+  /* Option A controls */
+  .wifi-sim { display:flex;gap:8px;align-items:center;justify-content:center;margin:12px 0; }
+  .wifi-sim .dist { font-weight:700;color:var(--muted);padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.9); }
+  .wifi-icon { font-size:18px; margin-left:8px; }
+
+  /* audio progress */
+  .audio-progress {
+    position: fixed;
+    left: 18px;
+    right: 120px;
+    bottom: 70px;
+    height: 36px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    z-index: 90;
+    background: rgba(255,255,255,0.95);
+    padding:6px 10px;
+    border-radius:999px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    display:none;
+  }
+  body.dark .audio-progress { background: rgba(255,255,255,0.04); box-shadow: 0 8px 24px rgba(0,0,0,0.45); color: #e6e6e9; }
+  .audio-progress progress { width:100%; height:6px; appearance:none; -webkit-appearance:none; border-radius:6px; overflow:hidden; background:rgba(0,0,0,0.06); }
+  .audio-progress progress::-webkit-progress-bar { background:transparent; }
+  .audio-progress progress::-webkit-progress-value { background: linear-gradient(90deg,var(--primary),var(--primary-strong)); }
+  .audio-progress .time { font-size:12px; color:var(--muted); min-width:48px; text-align:right; }
+
+  /* small theme toggle */
+  .theme-toggle { font-size:14px; }
 </style>
 </head>
 <body>
@@ -160,47 +171,45 @@
     </div>
   </div>
 
-  <!-- right controls -->
   <div class="header-right">
     <button class="btn small" id="simulateBtn" title="Simuler détection Wi-Fi">Simuler Wi-Fi</button>
+
+    <!-- Theme toggle (manual as requested) -->
+    <button class="btn small theme-toggle" id="themeToggle" title="Basculer thème">🌓</button>
+
+    <!-- open collection -->
     <button class="btn small" id="openCollectionBtn" title="Voir ma collection">Collection</button>
 
-    <!-- Connexion / Compte -->
     <div class="account-menu">
       <button id="accountBtn" class="account-btn">Connexion</button>
-      <div id="menuPopup" class="menu-popup" role="menu" aria-hidden="true">
-        <!-- content injected dynamically -->
-      </div>
+      <div id="menuPopup" class="menu-popup" role="menu" aria-hidden="true"></div>
     </div>
   </div>
 </header>
 
 <main>
-  <!-- automatic detection message -->
-  <div id="status" style="text-align:center;margin-top:12px;color:#333;font-size:14px">En attente de détection Wi-Fi…</div>
+  <div id="status" style="text-align:center;margin-top:12px;color:#333;font-size:14px">
+    En attente de détection Wi-Fi…
+    <small id="networkDetails"></small>
+  </div>
 
-  <!-- stop button (legacy) -->
-  <button id="stop" onclick="stopAudio()" style="
-    margin-top:1rem;
-    padding:0.5rem 1rem;
-    background:#ff5c5c;
-    color:white;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
-    display:none;
-  ">Arrêter l'audio</button>
+  <!-- Option A controls: forward/back + distance + icon -->
+  <div class="wifi-sim" id="wifiSimControls" style="display:flex">
+    <button id="btnBack" class="btn small" title="Reculer">◀ Reculer</button>
+    <div class="dist">Distance: <span id="simDistance">0</span> m</div>
+    <button id="btnForward" class="btn small" title="Avancer">Avancer ▶</button>
+    <div class="wifi-icon" id="wifiIcon" aria-hidden>📶📶📶</div>
+  </div>
 
-  <!-- room title -->
+  <button id="stop" onclick="stopAudio()" style="margin-top:1rem;padding:0.5rem 1rem;background:#ff5c5c;color:white;border:none;border-radius:5px;cursor:pointer;display:none;">Arrêter l'audio</button>
+
   <div class="room-title fade-in" id="roomTitle" style="display:none">
     <h2 id="roomName">Salle</h2>
     <div id="roomStats" class="muted">0 œuvres</div>
   </div>
 
-  <!-- artworks -->
   <div id="grid" class="grid" aria-live="polite"></div>
 
-  <!-- bottom collection -->
   <div class="bottom-bar">
     <div id="collectionBox" class="collection">
       <h4>Ma collection (favoris + consultées)</h4>
@@ -214,10 +223,16 @@
   </div>
 </main>
 
-<!-- STOP floating button -->
+<!-- Floating stop -->
 <button id="stopBtn" class="stop-btn" title="Arrêter l'audio" onclick="stopCurrentAudio()">■ Stop</button>
 
-<!-- Audio permission overlay (browser autoplay policy) -->
+<!-- Audio progress -->
+<div id="audioProgress" class="audio-progress">
+  <div style="width:14px;">🔊</div>
+  <progress id="progressBar" value="0" max="100"></progress>
+  <div class="time" id="progressTime">0:00</div>
+</div>
+
 <div id="audioOverlay" class="audio-overlay" style="display:none">
   <div class="audio-card">
     <h3>Activer le son</h3>
@@ -227,7 +242,6 @@
   </div>
 </div>
 
-<!-- Login modal (modern style) -->
 <div id="loginModal" class="login-modal" aria-hidden="true">
   <div class="login-card" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <h3 id="loginTitle">Se connecter / Créer un compte</h3>
@@ -244,7 +258,7 @@
 </div>
 
 <script>
-/* ---------- Keep your original ROOMS and functionality, extend with login ---------- */
+/* ---------- ROOMS & artworks ---------- */
 const ROOMS = {
   impressionnisme: {
     id: 'impressionnisme',
@@ -285,7 +299,6 @@ let guestFavorites = new Set(JSON.parse(localStorage.getItem('ab_favs')||'[]'));
 let guestVisited = new Set(JSON.parse(localStorage.getItem('ab_visited')||'[]'));
 
 // users stored in localStorage under key 'ab_users'
-// structure: { "email@example.com": { password: "...", favorites: [...], visited: [...] } }
 let USERS = JSON.parse(localStorage.getItem('ab_users') || '{}');
 let currentUser = localStorage.getItem('ab_current') || null; // email or null
 
@@ -294,6 +307,7 @@ const grid = document.getElementById('grid');
 const roomName = document.getElementById('roomName');
 const roomStats = document.getElementById('roomStats');
 const status = document.getElementById('status');
+const networkDetails = document.getElementById('networkDetails');
 const roomTitle = document.getElementById('roomTitle');
 const collectionList = document.getElementById('collectionList');
 const simulateBtn = document.getElementById('simulateBtn');
@@ -315,6 +329,16 @@ const collectionBox = document.getElementById('collectionBox');
 const collectionInfo = document.getElementById('collectionInfo');
 const collectionCTA = document.getElementById('collectionCTA');
 const ctaLogin = document.getElementById('ctaLogin');
+
+const btnForward = document.getElementById('btnForward');
+const btnBack = document.getElementById('btnBack');
+const simDistance = document.getElementById('simDistance');
+const wifiIcon = document.getElementById('wifiIcon');
+
+const themeToggle = document.getElementById('themeToggle');
+const audioProgress = document.getElementById('audioProgress');
+const progressBar = document.getElementById('progressBar');
+const progressTime = document.getElementById('progressTime');
 
 /* ---------- Helpers: storage & users ---------- */
 function persistUsers(){ localStorage.setItem('ab_users', JSON.stringify(USERS)); }
@@ -363,6 +387,7 @@ function playTransitionTone(duration=120, freq=880, vol=0.15){
 
 /* ---------- UI rendering (artworks) ---------- */
 function renderRoom(room){
+  if(!room) return;
   currentRoom = room;
   playTransitionTone(); // fx when arriving in a room
   roomName.textContent = room.name;
@@ -372,16 +397,21 @@ function renderRoom(room){
   grid.innerHTML = '';
 
   const favSet = getFavoritesSet();
+  const visitedSet = getVisitedSet();
 
   room.artworks.forEach(art => {
     const card = document.createElement('div');
     card.className = 'card fade-in';
     card.setAttribute('role','button');
     card.setAttribute('tabindex','0');
+    card.dataset.artId = art.id;
 
-    // card inner html
+    // show "Consultée" badge if visited
+    const consultedBadge = visitedSet.has(art.id) ? `<div class="consulted">Consultée ✓</div>` : '';
+
     card.innerHTML = `
       <img class="thumb" src="${art.img}" alt="${escapeHtml(art.title)}">
+      ${consultedBadge}
       <div class="meta">
         <h3>${escapeHtml(art.title)}</h3>
         <div class="meta-row">
@@ -398,7 +428,6 @@ function renderRoom(room){
       </div>
     `;
 
-    // click card or Play button -> play
     card.addEventListener('click', (e)=>{
       const favBtn = e.target.closest('button[data-art]');
       const playBtn = e.target.closest('button[data-play]');
@@ -407,19 +436,23 @@ function renderRoom(room){
       playArtworkById(art.id);
     });
 
-    // keyboard accessibility: enter/space to play
     card.addEventListener('keydown', (ev)=>{
       if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); playArtworkById(art.id); }
     });
 
     grid.appendChild(card);
   });
+
+  // if audio is currently playing, reapply badge
+  updateAudioBadge();
 }
 
-/* escape helper to avoid naive html injection */
+/* escape helper */
 function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;') }
 
 /* ---------- Audio management ---------- */
+let _audioProgressInterval = null;
+
 function stopCurrentAudio(){
   if(currentAudio){
     try{
@@ -428,54 +461,134 @@ function stopCurrentAudio(){
     }catch(e){}
     currentAudio = null;
   }
-  // hide stop button
   stopBtn.style.display = 'none';
-  // legacy stop button
   const stopLegacy = document.getElementById('stop');
   if(stopLegacy) stopLegacy.style.display = 'none';
+
+  // clear progress interval
+  if(_audioProgressInterval){
+    clearInterval(_audioProgressInterval);
+    _audioProgressInterval = null;
+  }
+  // hide progress UI
+  audioProgress.style.display = 'none';
+  progressBar.value = 0;
+  progressTime.textContent = '0:00';
+
+  document.querySelectorAll('.card.playing').forEach(c => c.classList.remove('playing'));
+  document.querySelectorAll('.card .playing-badge').forEach(b => b.remove());
 }
 
-/* Play artwork by id (stops previous audio automatically) */
+/* legacy global called by inline onclick */
+function stopAudio(){ stopCurrentAudio(); }
+
+/* Play artwork by id */
 function playArtworkById(id){
   const art = findArtwork(id);
   if(!art) return;
-  // if not allowed yet, show overlay for user to enable sound
   if(!transitionAllowed){
     showAudioOverlay();
     return;
   }
 
-  // play small transition tone
   playTransitionTone(90,1200,0.08);
-
-  // stop old audio
   stopCurrentAudio();
 
-  // create new audio and play
   currentAudio = new Audio(art.audio);
   currentAudio.preload = 'auto';
-  currentAudio.addEventListener('canplaythrough', ()=>{ 
-    currentAudio.play().catch(()=>{/* autoplay blocked */}); 
+  currentAudio._artId = art.id;
+
+  currentAudio.addEventListener('canplaythrough', ()=>{
+    currentAudio.play().catch(()=>{/* blocked */});
   });
-  currentAudio.addEventListener('ended', ()=>{ 
-    currentAudio = null; 
+
+  currentAudio.addEventListener('timeupdate', ()=>{
+    // timeupdate handled via interval for better control
+  });
+
+  currentAudio.addEventListener('ended', ()=>{
+    currentAudio = null;
     stopBtn.style.display = 'none';
     const stopLegacy = document.getElementById('stop');
     if(stopLegacy) stopLegacy.style.display = 'none';
+    document.querySelectorAll('.card.playing').forEach(c => c.classList.remove('playing'));
+    document.querySelectorAll('.card .playing-badge').forEach(b => b.remove());
+    // clear interval & hide progress
+    if(_audioProgressInterval){ clearInterval(_audioProgressInterval); _audioProgressInterval = null; }
+    audioProgress.style.display = 'none';
+    progressBar.value = 0;
+    progressTime.textContent = '0:00';
   });
 
-  // show stop button
   stopBtn.style.display = 'block';
   const stopLegacy = document.getElementById('stop');
   if(stopLegacy) stopLegacy.style.display = 'inline-block';
 
-  // mark visited & update UI (store into correct user or guest)
+  // mark visited & update UI
   const visitedSet = getVisitedSet();
   visitedSet.add(art.id);
   saveVisitedSet(visitedSet);
   renderCollection();
+  // re-render room to show consulted badge on cards
+  if(currentRoom) renderRoom(currentRoom);
 
   flashArtworkCard(id);
+
+  // badge
+  const playButtons = document.querySelectorAll(`[data-play="${id}"]`);
+  if(playButtons.length){
+    const card = playButtons[0].closest('.card');
+    if(card){
+      card.classList.add('playing');
+      const badge = document.createElement('div');
+      badge.className = 'playing-badge';
+      badge.textContent = 'En lecture…';
+      card.appendChild(badge);
+    }
+  }
+
+  // show & update progress bar via interval
+  audioProgress.style.display = 'flex';
+  progressBar.value = 0;
+  progressTime.textContent = '0:00';
+  if(_audioProgressInterval) clearInterval(_audioProgressInterval);
+  _audioProgressInterval = setInterval(()=>{
+    if(!currentAudio) return;
+    const dur = currentAudio.duration || 0;
+    const cur = currentAudio.currentTime || 0;
+    if(dur && !isNaN(dur)){
+      const pct = (cur/dur)*100;
+      progressBar.value = pct;
+      progressTime.textContent = formatTime(cur) + (dur ? ' / ' + formatTime(dur) : '');
+    } else {
+      progressBar.value = 0;
+      progressTime.textContent = formatTime(cur);
+    }
+  }, 250);
+}
+
+/* format seconds to mm:ss */
+function formatTime(s){
+  if(!s || isNaN(s)) s = 0;
+  const mm = Math.floor(s/60);
+  const ss = Math.floor(s%60);
+  return `${mm}:${ss.toString().padStart(2,'0')}`;
+}
+
+/* update audio badge if audio present */
+function updateAudioBadge(){
+  document.querySelectorAll('.card.playing').forEach(c => c.classList.remove('playing'));
+  document.querySelectorAll('.card .playing-badge').forEach(b => b.remove());
+  if(currentAudio && currentAudio._artId){
+    const card = document.querySelector(`.card[data-art-id="${currentAudio._artId}"]`);
+    if(card){
+      card.classList.add('playing');
+      const badge = document.createElement('div');
+      badge.className = 'playing-badge';
+      badge.textContent = 'En lecture…';
+      card.appendChild(badge);
+    }
+  }
 }
 
 /* find art in ROOMS */
@@ -497,45 +610,20 @@ function flashArtworkCard(id){
   }
 }
 
-/* ---------- Favorites & Collection (per-user) ---------- */
+/* ---------- Favorites & Collection ---------- */
 function toggleFav(id){
-  let favSet;
-  if(currentUser && USERS[currentUser]){
-    favSet = new Set(USERS[currentUser].favorites || []);
-  } else {
-    favSet = new Set(guestFavorites);
-  }
-
-  if(favSet.has(id)) favSet.delete(id);
-  else favSet.add(id);
-
-  // save back
-  if(currentUser && USERS[currentUser]){
-    USERS[currentUser].favorites = Array.from(favSet);
-    persistUsers();
-  } else {
-    guestFavorites = new Set(Array.from(favSet));
-    localStorage.setItem('ab_favs', JSON.stringify(Array.from(guestFavorites)));
-  }
-
-  // mise à jour immédiate du bouton clic
-  document.querySelectorAll(`button[data-art="${id}"]`).forEach(btn=>{
-    const isFav = favSet.has(id);
-    btn.innerHTML = starSvg(isFav);
-  });
-
-  // update collection
+  const favSet = getFavoritesSet();
+  if(favSet.has(id)) favSet.delete(id); else favSet.add(id);
+  saveFavoritesSet(favSet);
+  renderRoom(currentRoom);
   renderCollection();
 }
 
-
-/* render collection list (favorites first) */
 function renderCollection(){
   collectionList.innerHTML = '';
   const favSet = getFavoritesSet();
   const visitedSet = getVisitedSet();
 
-  // update collection box UI depending on login
   if(!currentUser){
     collectionBox.classList.add('locked');
     collectionInfo.textContent = "Connecte-toi pour sauvegarder et retrouver ta collection.";
@@ -546,48 +634,37 @@ function renderCollection(){
     collectionCTA.style.display = 'none';
   }
 
-  // favorites
-  const favArray = Array.from(favSet).map(id => findArtwork(id)).filter(Boolean)
-    .sort((a,b)=> a.title.localeCompare(b.title));
-  if(favArray.length>0){
-    const favHeader = document.createElement('li');
-    favHeader.textContent = 'Favoris';
-    favHeader.style.fontWeight='700';
+  if(favSet.size>0){
+    const favHeader = document.createElement('li'); favHeader.textContent = 'Favoris'; favHeader.style.fontWeight='700';
     collectionList.appendChild(favHeader);
-
-    favArray.forEach(art => {
+    for(const id of favSet){
+      const art = findArtwork(id);
+      if(!art) continue;
       const li = document.createElement('li');
       li.innerHTML = `${escapeHtml(art.title)} <button class="btn small" style="float:right" onclick="playArtworkById('${art.id}')">Écouter</button>`;
       collectionList.appendChild(li);
-    });
+    }
   }
 
-  // visited (but not favorites)
-  const otherVisited = Array.from(visitedSet).filter(id => !favSet.has(id))
-    .map(id => findArtwork(id)).filter(Boolean)
-    .sort((a,b)=> a.title.localeCompare(b.title));
+  const otherVisited = [...visitedSet].filter(id=>!favSet.has(id));
   if(otherVisited.length>0){
-    const header = document.createElement('li');
-    header.textContent = 'Consultées';
-    header.style.fontWeight='700';
-    header.style.marginTop='8px';
+    const header = document.createElement('li'); header.textContent = 'Consultées'; header.style.fontWeight='700'; header.style.marginTop='8px';
     collectionList.appendChild(header);
-
-    otherVisited.forEach(art => {
+    otherVisited.forEach(id=>{
+      const art = findArtwork(id);
+      if(!art) return;
       const li = document.createElement('li');
       li.innerHTML = `${escapeHtml(art.title)} <button class="btn small" style="float:right" onclick="playArtworkById('${art.id}')">Écouter</button>`;
       collectionList.appendChild(li);
     });
   }
 
-  if(favArray.length===0 && otherVisited.length===0){
-    const li = document.createElement('li');
-    li.textContent = 'Aucune œuvre pour le moment. Cliquez sur une œuvre pour l’écouter.';
-    collectionList.appendChild(li);
+  if(favSet.size===0 && otherVisited.length===0){
+    const li = document.createElement('li'); li.textContent = 'Aucune œuvre pour le moment. Cliquez sur une œuvre pour l’écouter.'; collectionList.appendChild(li);
   }
 }
 
-/* save helpers for favorites/visited */
+/* ---------- Save helpers repeated safely ---------- */
 function saveFavoritesSet(set){
   if(currentUser){
     if(!USERS[currentUser]) USERS[currentUser] = { password:'', favorites:[], visited:[] };
@@ -609,19 +686,53 @@ function saveVisitedSet(set){
   }
 }
 
-/* ---------- Simulate Wi-Fi detection ---------- */
-function simulateDetection(){
-  status.textContent = 'Détection Wi-Fi en cours…';
-  // small UX delay
-  setTimeout(()=>{
-    // pick a random room
-    const keys = Object.keys(ROOMS);
-    const choice = keys[Math.floor(Math.random()*keys.length)];
-    renderRoom(ROOMS[choice]);
-    // scroll to top to show room
-    window.scrollTo({top:0,behavior:'smooth'});
-  }, 700);
+/* ---------- OPTION A: Avancer / Reculer (distance 0 → 30m) ---------- */
+let distance = 0; // meters (0..30)
+const MIN_DIST = 0;
+const MAX_DIST = 30;
+
+function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+function changeDistance(delta){
+  distance = clamp(distance + delta, MIN_DIST, MAX_DIST);
+  simDistance.textContent = distance;
+  updateWifiIcon();
+  updateRoomFromDistance();
 }
+
+function updateWifiIcon(){
+  if(!wifiIcon) return;
+  if(distance <= 10) wifiIcon.textContent = '📶📶📶';
+  else if(distance <= 20) wifiIcon.textContent = '📶📶';
+  else wifiIcon.textContent = '📶';
+}
+
+function updateRoomFromDistance(){
+  let target = null;
+  if(distance <= 10) target = ROOMS.impressionnisme;
+  else if(distance <= 20) target = ROOMS.modernisme;
+  else target = ROOMS.sculpture;
+
+  if(!currentRoom || currentRoom.id !== target.id){
+    renderRoom(target);
+    status.textContent = `Distance: ${distance} m — Salle sélectionnée : ${target.name}`;
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+}
+
+/* simulate button: activates the Option A simulation initial state */
+function simulateDetection(){
+  status.textContent = 'Simulation Wi-Fi démarrée (Option A)…';
+  // start from a default distance (0) and render accordingly
+  distance = 0;
+  simDistance.textContent = distance;
+  updateWifiIcon();
+  updateRoomFromDistance();
+}
+
+/* wire forward/back buttons (guard if null) */
+if(btnForward) btnForward.addEventListener('click', ()=>changeDistance(+5));
+if(btnBack) btnBack.addEventListener('click', ()=>changeDistance(-5));
 
 /* ---------- Overlay & initial activation ---------- */
 function showAudioOverlay(){ audioOverlay.style.display='flex'; }
@@ -639,7 +750,6 @@ function playSvg(){
 }
 
 /* ---------- Account / Login logic ---------- */
-/* show account menu or login depending on state */
 function updateAccountUI(){
   if(currentUser && USERS[currentUser]){
     accountBtn.textContent = currentUser;
@@ -657,13 +767,11 @@ function updateAccountUI(){
   }
 }
 
-/* toggle menu */
 accountBtn.addEventListener('click', ()=>{
   if(menuPopup.style.display === 'block'){ menuPopup.style.display = 'none'; menuPopup.setAttribute('aria-hidden','true'); }
   else { menuPopup.style.display = 'block'; menuPopup.setAttribute('aria-hidden','false'); }
 });
 
-/* open login modal */
 function openLoginModal(){
   loginModal.style.display = 'flex';
   loginModal.setAttribute('aria-hidden','false');
@@ -671,24 +779,20 @@ function openLoginModal(){
   menuPopup.setAttribute('aria-hidden','true');
 }
 
-/* close login */
 closeLogin.addEventListener('click', ()=>{
   loginModal.style.display = 'none';
   loginModal.setAttribute('aria-hidden','true');
 });
 
-/* login & register handlers */
 loginSubmit.addEventListener('click', ()=>{
   const email = (loginEmail.value || '').trim().toLowerCase();
   const pass = (loginPassword.value || '').trim();
   if(!email || !pass){ alert('Email et mot de passe requis'); return; }
   if(!USERS[email]){ alert('Compte introuvable. Créez un compte.'); return; }
   if(USERS[email].password !== pass){ alert('Mot de passe incorrect'); return; }
-  // successful login
   setCurrentUser(email);
   loginModal.style.display = 'none';
   loginModal.setAttribute('aria-hidden','true');
-  // ensure sets exist
   USERS[email].favorites = USERS[email].favorites || [];
   USERS[email].visited = USERS[email].visited || [];
   persistUsers();
@@ -709,23 +813,18 @@ registerSubmit.addEventListener('click', ()=>{
   alert('Compte créé et connecté : ' + email);
 });
 
-/* view profile (simple) */
 function viewProfile(){
   menuPopup.style.display = 'none';
   menuPopup.setAttribute('aria-hidden','true');
   alert('Profil: ' + currentUser + '\nFavoris: ' + JSON.stringify(USERS[currentUser].favorites || []) );
 }
 
-/* logout */
 function logout(){
   setCurrentUser(null);
   alert('Déconnecté');
 }
 
-/* CTA login button in collection area */
-ctaLogin.addEventListener('click', ()=>{
-  openLoginModal();
-});
+ctaLogin.addEventListener('click', ()=>{ openLoginModal(); });
 
 /* ---------- keyboard + UI wiring ---------- */
 simulateBtn.addEventListener('click', simulateDetection);
@@ -733,25 +832,53 @@ openCollectionBtn.addEventListener('click', ()=>{ window.scrollTo({top:document.
 
 enableSoundBtn.addEventListener('click', ()=>{
   transitionAllowed = true;
-  // play a tiny click to ensure audio context allowed
   playTransitionTone(80,1000,0.06);
   hideAudioOverlay();
 });
 
-/* On first load: show overlay so user can allow audio if they want automatic playback */
+/* ---------- Theme toggle (manual) ---------- */
+function applySavedTheme(){
+  const saved = localStorage.getItem('ab_theme');
+  if(saved === 'dark'){
+    document.body.classList.add('dark');
+  } else {
+    document.body.classList.remove('dark');
+  }
+  updateThemeIcon();
+}
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  localStorage.setItem('ab_theme', isDark ? 'dark' : 'light');
+  updateThemeIcon();
+}
+function updateThemeIcon(){
+  if(document.body.classList.contains('dark')) themeToggle.textContent = '🌙';
+  else themeToggle.textContent = '🌓';
+}
+themeToggle.addEventListener('click', toggleTheme);
+
+/* ---------- Initial load ---------- */
 window.addEventListener('load', ()=>{
+  // show overlay once so user can opt-in to audio
   audioOverlay.style.display = 'flex';
-  // restore current user if any
+  // validate currentUser exists in USERS
   if(currentUser && !USERS[currentUser]){ currentUser = null; localStorage.removeItem('ab_current'); }
   updateAccountUI();
   renderCollection();
+  // init Option A display
+  simDistance.textContent = distance;
+  updateWifiIcon();
+  // optionally show a default room
+  renderRoom(ROOMS[Object.keys(ROOMS)[0]]);
+  // apply theme
+  applySavedTheme();
 });
-
-/* expose a couple helpers for buttons created dynamically */
+/* expose helpers globally for inline onclicks */
 window.playArtworkById = playArtworkById;
 window.toggleFav = toggleFav;
 window.stopCurrentAudio = stopCurrentAudio;
-
+window.stopAudio = stopAudio;
 </script>
 </body>
 </html>
