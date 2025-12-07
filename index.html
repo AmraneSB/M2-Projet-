@@ -37,6 +37,7 @@
   header h1{font-size:18px;margin:0}
   header p.sub{margin:0;font-size:12px;opacity:0.95}
 
+  /* header right group */
   .header-right{margin-left:auto;display:flex;gap:8px;align-items:center}
   .account-btn{
     background:rgba(255,255,255,0.12);
@@ -52,6 +53,7 @@
 
   main{padding:16px;flex:1;max-width:720px;margin:0 auto;width:100%}
 
+  /* controls */
   .controls{display:flex;gap:8px;justify-content:center;margin-top:12px;margin-bottom:16px}
   .btn{
     background:var(--card);border-radius:999px;padding:8px 12px;border:none;cursor:pointer;
@@ -60,11 +62,13 @@
   .btn.primary{background:linear-gradient(90deg,var(--primary),var(--primary-strong));color:white;box-shadow:0 6px 18px rgba(90,64,200,0.16)}
   .small{padding:6px 10px;font-size:14px}
 
+  /* current room title + animation */
   .room-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
   .room-title h2{margin:0;font-size:18px}
   .fade-in{animation:fadeIn .35s ease both}
   @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
+  /* grid of artworks */
   .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
   .card{
     background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 6px 18px rgba(22,22,45,0.05);
@@ -77,6 +81,7 @@
   .meta-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
   .muted{color:var(--muted);font-size:13px}
 
+  /* bottom area */
   .bottom-bar{position:sticky;bottom:12px;margin-top:18px}
   .collection{
     background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,255,0.98));
@@ -85,9 +90,12 @@
   .collection h4{margin:0 0 8px 0}
   .collection ul{margin:0;padding:0 12px;max-height:180px;overflow:auto}
   .collection li{list-style:none;padding:8px 0;border-bottom:1px dashed #efefef;font-size:14px}
+
+  /* icons buttons */
   .icon-btn{background:transparent;border:none;cursor:pointer;padding:6px;border-radius:8px}
   .fav-active{color:var(--accent);filter:drop-shadow(0 2px 6px rgba(255,204,0,0.15))}
 
+  /* overlay audio permission */
   .audio-overlay{
     position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(6,6,12,0.45);z-index:80;
   }
@@ -95,6 +103,7 @@
   .audio-card p{margin:8px 0 14px 0}
   .help{font-size:13px;color:#555;margin-top:8px}
 
+  /* stop button style */
   .stop-btn {
     position: fixed;
     right: 18px;
@@ -110,6 +119,7 @@
     display: none;
   }
 
+  /* modern login modal (option 2) */
   .login-modal {
     position: fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:200;
     background: linear-gradient(rgba(5,5,8,0.45), rgba(5,5,8,0.45));
@@ -127,12 +137,14 @@
   .ghost{background:transparent;border:1px solid #ddd;padding:9px;border-radius:10px;cursor:pointer}
   .primary{background:linear-gradient(90deg,var(--primary),var(--primary-strong));color:white;padding:9px;border-radius:10px;border:none;cursor:pointer;width:100%}
 
+  /* responsive tweaks */
   @media (max-width:520px){
     .grid{grid-template-columns:1fr}
     header h1{font-size:16px}
     header img.logo{height:44px}
   }
 
+  /* small helper: blurred collection when not connected */
   .collection.locked{filter:blur(2px) grayscale(.2);opacity:.9;pointer-events:none}
   .collection-cta{display:flex;gap:8px;align-items:center;margin-top:8px}
 </style>
@@ -148,20 +160,27 @@
     </div>
   </div>
 
+  <!-- right controls -->
   <div class="header-right">
     <button class="btn small" id="simulateBtn" title="Simuler détection Wi-Fi">Simuler Wi-Fi</button>
     <button class="btn small" id="openCollectionBtn" title="Voir ma collection">Collection</button>
+
+    <!-- Connexion / Compte -->
     <div class="account-menu">
       <button id="accountBtn" class="account-btn">Connexion</button>
-      <div id="menuPopup" class="menu-popup" role="menu" aria-hidden="true"></div>
+      <div id="menuPopup" class="menu-popup" role="menu" aria-hidden="true">
+        <!-- content injected dynamically -->
+      </div>
     </div>
   </div>
 </header>
 
 <main>
+  <!-- automatic detection message -->
   <div id="status" style="text-align:center;margin-top:12px;color:#333;font-size:14px">En attente de détection Wi-Fi…</div>
 
-  <button id="stop" onclick="stopCurrentAudio()" style="
+  <!-- stop button (legacy) -->
+  <button id="stop" onclick="stopAudio()" style="
     margin-top:1rem;
     padding:0.5rem 1rem;
     background:#ff5c5c;
@@ -172,13 +191,16 @@
     display:none;
   ">Arrêter l'audio</button>
 
+  <!-- room title -->
   <div class="room-title fade-in" id="roomTitle" style="display:none">
     <h2 id="roomName">Salle</h2>
     <div id="roomStats" class="muted">0 œuvres</div>
   </div>
 
+  <!-- artworks -->
   <div id="grid" class="grid" aria-live="polite"></div>
 
+  <!-- bottom collection -->
   <div class="bottom-bar">
     <div id="collectionBox" class="collection">
       <h4>Ma collection (favoris + consultées)</h4>
@@ -192,8 +214,10 @@
   </div>
 </main>
 
+<!-- STOP floating button -->
 <button id="stopBtn" class="stop-btn" title="Arrêter l'audio" onclick="stopCurrentAudio()">■ Stop</button>
 
+<!-- Audio permission overlay (browser autoplay policy) -->
 <div id="audioOverlay" class="audio-overlay" style="display:none">
   <div class="audio-card">
     <h3>Activer le son</h3>
@@ -203,6 +227,7 @@
   </div>
 </div>
 
+<!-- Login modal (modern style) -->
 <div id="loginModal" class="login-modal" aria-hidden="true">
   <div class="login-card" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
     <h3 id="loginTitle">Se connecter / Créer un compte</h3>
@@ -219,7 +244,7 @@
 </div>
 
 <script>
-/* ---------- Rooms data ---------- */
+/* ---------- Keep your original ROOMS and functionality, extend with login ---------- */
 const ROOMS = {
   impressionnisme: {
     id: 'impressionnisme',
@@ -252,12 +277,17 @@ const ROOMS = {
 
 /* ---------- State ---------- */
 let currentRoom = null;
-let currentAudio = null;
-let transitionAllowed = false;
+let currentAudio = null;        // HTMLAudioElement for artwork playback
+let transitionAllowed = false;  // set after user enables audio overlay
+
+// local guest sets (used when not logged)
 let guestFavorites = new Set(JSON.parse(localStorage.getItem('ab_favs')||'[]'));
 let guestVisited = new Set(JSON.parse(localStorage.getItem('ab_visited')||'[]'));
+
+// users stored in localStorage under key 'ab_users'
+// structure: { "email@example.com": { password: "...", favorites: [...], visited: [...] } }
 let USERS = JSON.parse(localStorage.getItem('ab_users') || '{}');
-let currentUser = localStorage.getItem('ab_current') || null;
+let currentUser = localStorage.getItem('ab_current') || null; // email or null
 
 /* ---------- DOM refs ---------- */
 const grid = document.getElementById('grid');
@@ -274,6 +304,7 @@ const stopBtn = document.getElementById('stopBtn');
 
 const accountBtn = document.getElementById('accountBtn');
 const menuPopup = document.getElementById('menuPopup');
+
 const loginModal = document.getElementById('loginModal');
 const loginEmail = document.getElementById('loginEmail');
 const loginPassword = document.getElementById('loginPassword');
@@ -285,161 +316,442 @@ const collectionInfo = document.getElementById('collectionInfo');
 const collectionCTA = document.getElementById('collectionCTA');
 const ctaLogin = document.getElementById('ctaLogin');
 
-/* ---------- Helpers & Storage ---------- */
+/* ---------- Helpers: storage & users ---------- */
 function persistUsers(){ localStorage.setItem('ab_users', JSON.stringify(USERS)); }
 function setCurrentUser(email){
   currentUser = email;
-  if(email) localStorage.setItem('ab_current', email); else localStorage.removeItem('ab_current');
+  if(email) localStorage.setItem('ab_current', email);
+  else localStorage.removeItem('ab_current');
+  updateAccountUI();
+  renderCollection();
 }
-function persistGuest(){ 
-  localStorage.setItem('ab_favs', JSON.stringify(Array.from(guestFavorites))); 
-  localStorage.setItem('ab_visited', JSON.stringify(Array.from(guestVisited)));
-}
-function isValidEmail(email){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
 
-/* ---------- Rendering ---------- */
+/* get favorites for active context (user if logged, else guest) */
+function getFavoritesSet(){
+  if(currentUser && USERS[currentUser]) return new Set(USERS[currentUser].favorites || []);
+  return new Set(Array.from(guestFavorites));
+}
+function getVisitedSet(){
+  if(currentUser && USERS[currentUser]) return new Set(USERS[currentUser].visited || []);
+  return new Set(Array.from(guestVisited));
+}
+
+/* save favorites/visited back to storage for current context */
+function saveFavoritesSet(set){
+  if(currentUser && USERS[currentUser]){ USERS[currentUser].favorites = Array.from(set); persistUsers(); }
+  else { guestFavorites = new Set(Array.from(set)); localStorage.setItem('ab_favs', JSON.stringify(Array.from(guestFavorites))); }
+}
+function saveVisitedSet(set){
+  if(currentUser && USERS[currentUser]){ USERS[currentUser].visited = Array.from(set); persistUsers(); }
+  else { guestVisited = new Set(Array.from(set)); localStorage.setItem('ab_visited', JSON.stringify(Array.from(guestVisited))); }
+}
+
+/* ---------- Helpers: misc ---------- */
+function playTransitionTone(duration=120, freq=880, vol=0.15){
+  if(!transitionAllowed) return;
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine'; o.frequency.value = freq;
+    g.gain.value = vol;
+    o.connect(g); g.connect(ctx.destination);
+    o.start();
+    setTimeout(()=>{ o.stop(); ctx.close(); }, duration);
+  }catch(e){ console.warn('WebAudio not available', e) }
+}
+
+/* ---------- UI rendering (artworks) ---------- */
 function renderRoom(room){
-  if(!room) return;
   currentRoom = room;
-  roomTitle.style.display='flex';
+  playTransitionTone(); // fx when arriving in a room
   roomName.textContent = room.name;
-  roomStats.textContent = room.artworks.length + ' œuvres';
-  grid.innerHTML='';
-  room.artworks.forEach(a=>{
-    const div = document.createElement('div'); div.className='card fade-in';
-    div.innerHTML = `
-      <img src="${a.img}" class="thumb" alt="${a.title}">
+  roomStats.textContent = `${room.artworks.length} œuvres`;
+  roomTitle.style.display = 'flex';
+  status.style.display = 'none';
+  grid.innerHTML = '';
+
+  const favSet = getFavoritesSet();
+
+  room.artworks.forEach(art => {
+    const card = document.createElement('div');
+    card.className = 'card fade-in';
+    card.setAttribute('role','button');
+    card.setAttribute('tabindex','0');
+
+    // card inner html
+    card.innerHTML = `
+      <img class="thumb" src="${art.img}" alt="${escapeHtml(art.title)}">
       <div class="meta">
-        <h3>${a.title}</h3>
+        <h3>${escapeHtml(art.title)}</h3>
         <div class="meta-row">
-          <span class="muted">${a.id}</span>
-          <button class="icon-btn ${guestFavorites.has(a.id)?'fav-active':''}" title="Favoris">★</button>
+          <div class="muted">Cliquer pour écouter</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="icon-btn" title="Favoris" data-art="${art.id}" aria-label="Favoris">
+              ${favSet.has(art.id) ? starSvg(true) : starSvg(false)}
+            </button>
+            <button class="icon-btn" title="Écouter" data-play="${art.id}" aria-label="Écouter">
+              ${playSvg()}
+            </button>
+          </div>
         </div>
-      </div>`;
-    const favBtn = div.querySelector('.icon-btn');
-    favBtn.addEventListener('click', e=>{
-      if(guestFavorites.has(a.id)) guestFavorites.delete(a.id);
-      else guestFavorites.add(a.id);
-      favBtn.classList.toggle('fav-active');
-      persistGuest();
-      renderCollection();
+      </div>
+    `;
+
+    // click card or Play button -> play
+    card.addEventListener('click', (e)=>{
+      const favBtn = e.target.closest('button[data-art]');
+      const playBtn = e.target.closest('button[data-play]');
+      if(favBtn){ toggleFav(favBtn.getAttribute('data-art')); e.stopPropagation(); return; }
+      if(playBtn){ playArtworkById(playBtn.getAttribute('data-play')); e.stopPropagation(); return; }
+      playArtworkById(art.id);
     });
-    div.addEventListener('click', ()=>{
-      playAudio(a.audio);
-      guestVisited.add(a.id);
-      persistGuest();
-      renderCollection();
+
+    // keyboard accessibility: enter/space to play
+    card.addEventListener('keydown', (ev)=>{
+      if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); playArtworkById(art.id); }
     });
-    grid.appendChild(div);
+
+    grid.appendChild(card);
   });
 }
 
-/* ---------- Collection ---------- */
-function renderCollection(){
-  const combined = Array.from(new Set([...guestVisited,...guestFavorites]));
-  collectionList.innerHTML='';
-  if(combined.length===0){ collectionInfo.textContent='Pas encore d’œuvres consultées ou ajoutées.'; }
-  else{
-    combined.forEach(id=>{
-      const li = document.createElement('li'); li.textContent = id; collectionList.appendChild(li);
-    });
-    collectionInfo.textContent=`Total: ${combined.length} œuvres`;
-  }
-  if(currentUser) collectionBox.classList.remove('locked'), collectionCTA.style.display='none';
-  else collectionBox.classList.add('locked'), collectionCTA.style.display='flex';
-}
+/* escape helper to avoid naive html injection */
+function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;') }
 
-/* ---------- Audio ---------- */
-function playAudio(url){
-  stopCurrentAudio();
-  currentAudio = new Audio(url); currentAudio.play();
-  stopBtn.style.display='block';
-}
+/* ---------- Audio management ---------- */
 function stopCurrentAudio(){
-  if(currentAudio){ currentAudio.pause(); currentAudio=null; stopBtn.style.display='none'; }
+  if(currentAudio){
+    try{
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    }catch(e){}
+    currentAudio = null;
+  }
+  // hide stop button
+  stopBtn.style.display = 'none';
+  // legacy stop button
+  const stopLegacy = document.getElementById('stop');
+  if(stopLegacy) stopLegacy.style.display = 'none';
 }
 
-/* ---------- Simulate Detection ---------- */
-simulateBtn.addEventListener('click', ()=>{
-  const keys = Object.keys(ROOMS);
-  const r = ROOMS[keys[Math.floor(Math.random()*keys.length)]];
-  renderRoom(r);
-  status.textContent = 'Wi-Fi détecté dans ' + r.name;
-});
-
-/* ---------- Audio overlay ---------- */
-enableSoundBtn.addEventListener('click', ()=>{
-  audioOverlay.style.display='none';
-});
-
-/* ---------- Account menu ---------- */
-accountBtn.addEventListener('click', ()=>{
-  if(menuPopup.style.display==='block'){ menuPopup.style.display='none'; menuPopup.setAttribute('aria-hidden','true'); }
-  else{
-    menuPopup.innerHTML='';
-    if(currentUser){
-      const span = document.createElement('div'); span.textContent = currentUser; span.style.padding='10px'; menuPopup.appendChild(span);
-      const logoutBtn = document.createElement('button'); logoutBtn.textContent='Déconnexion';
-      logoutBtn.addEventListener('click', ()=>{ setCurrentUser(null); menuPopup.style.display='none'; renderCollection(); accountBtn.textContent='Connexion'; });
-      menuPopup.appendChild(logoutBtn);
-    } else {
-      const loginBtn = document.createElement('button'); loginBtn.textContent='Connexion / Créer';
-      loginBtn.addEventListener('click', ()=>{
-        loginModal.style.display='flex';
-        loginModal.setAttribute('aria-hidden','false');
-      });
-      menuPopup.appendChild(loginBtn);
-    }
-    menuPopup.style.display='block'; menuPopup.setAttribute('aria-hidden','false');
+/* Play artwork by id (stops previous audio automatically) */
+function playArtworkById(id){
+  const art = findArtwork(id);
+  if(!art) return;
+  // if not allowed yet, show overlay for user to enable sound
+  if(!transitionAllowed){
+    showAudioOverlay();
+    return;
   }
-});
 
-/* ---------- Login Modal ---------- */
-loginSubmit.addEventListener('click', ()=>{
-  const email = (loginEmail.value||'').trim().toLowerCase();
-  const pass = (loginPassword.value||'').trim();
-  if(!email||!pass){ alert('Email et mot de passe requis'); return; }
-  if(!isValidEmail(email)){ alert('Email invalide'); return; }
-  if(!USERS[email]){ alert('Compte introuvable. Créez un compte.'); return; }
-  if(USERS[email].password!==pass){ alert('Mot de passe incorrect'); return; }
+  // play small transition tone
+  playTransitionTone(90,1200,0.08);
 
-  setCurrentUser(email); loginModal.style.display='none'; loginModal.setAttribute('aria-hidden','true');
-  accountBtn.textContent = currentUser;
-  USERS[email].favorites = USERS[email].favorites||[];
-  USERS[email].visited = USERS[email].visited||[];
+  // stop old audio
+  stopCurrentAudio();
+
+  // create new audio and play
+  currentAudio = new Audio(art.audio);
+  currentAudio.preload = 'auto';
+  currentAudio.addEventListener('canplaythrough', ()=>{ 
+    currentAudio.play().catch(()=>{/* autoplay blocked */}); 
+  });
+  currentAudio.addEventListener('ended', ()=>{ 
+    currentAudio = null; 
+    stopBtn.style.display = 'none';
+    const stopLegacy = document.getElementById('stop');
+    if(stopLegacy) stopLegacy.style.display = 'none';
+  });
+
+  // show stop button
+  stopBtn.style.display = 'block';
+  const stopLegacy = document.getElementById('stop');
+  if(stopLegacy) stopLegacy.style.display = 'inline-block';
+
+  // mark visited & update UI (store into correct user or guest)
+  const visitedSet = getVisitedSet();
+  visitedSet.add(art.id);
+  saveVisitedSet(visitedSet);
   renderCollection();
-  alert('Connecté en tant que '+email);
-});
 
-registerSubmit.addEventListener('click', ()=>{
-  const email = (loginEmail.value||'').trim().toLowerCase();
-  const pass = (loginPassword.value||'').trim();
-  if(!email||!pass){ alert('Email et mot de passe requis'); return; }
-  if(!isValidEmail(email)){ alert('Email invalide'); return; }
-  if(USERS[email]){ alert('Ce compte existe déjà'); return; }
+  flashArtworkCard(id);
+}
 
-  USERS[email]={password:pass,favorites:Array.from(guestFavorites),visited:Array.from(guestVisited)};
-  persistUsers();
-  setCurrentUser(email);
-  loginModal.style.display='none'; loginModal.setAttribute('aria-hidden','true');
-  accountBtn.textContent = currentUser;
+/* find art in ROOMS */
+function findArtwork(id){
+  for(const r of Object.values(ROOMS)){
+    for(const a of r.artworks) if(a.id === id) return a;
+  }
+  return null;
+}
+
+/* flash card */
+function flashArtworkCard(id){
+  const btns = [...document.querySelectorAll(`[data-play="${id}"]`)];
+  if(btns.length>0){
+    const card = btns[0].closest('.card');
+    card.style.transition = 'transform .12s';
+    card.style.transform = 'scale(1.02)';
+    setTimeout(()=>{ card.style.transform = ''; }, 260);
+  }
+}
+
+/* ---------- Favorites & Collection (per-user) ---------- */
+function toggleFav(id){
+  let favSet;
+  if(currentUser && USERS[currentUser]){
+    favSet = new Set(USERS[currentUser].favorites || []);
+  } else {
+    favSet = new Set(guestFavorites);
+  }
+
+  if(favSet.has(id)) favSet.delete(id);
+  else favSet.add(id);
+
+  // save back
+  if(currentUser && USERS[currentUser]){
+    USERS[currentUser].favorites = Array.from(favSet);
+    persistUsers();
+  } else {
+    guestFavorites = new Set(Array.from(favSet));
+    localStorage.setItem('ab_favs', JSON.stringify(Array.from(guestFavorites)));
+  }
+
+  // mise à jour immédiate du bouton clic
+  document.querySelectorAll(`button[data-art="${id}"]`).forEach(btn=>{
+    const isFav = favSet.has(id);
+    btn.innerHTML = starSvg(isFav);
+  });
+
+  // update collection
   renderCollection();
-  alert('Compte créé et connecté : '+email);
+}
+
+
+/* render collection list (favorites first) */
+function renderCollection(){
+  collectionList.innerHTML = '';
+  const favSet = getFavoritesSet();
+  const visitedSet = getVisitedSet();
+
+  // update collection box UI depending on login
+  if(!currentUser){
+    collectionBox.classList.add('locked');
+    collectionInfo.textContent = "Connecte-toi pour sauvegarder et retrouver ta collection.";
+    collectionCTA.style.display = 'flex';
+  } else {
+    collectionBox.classList.remove('locked');
+    collectionInfo.textContent = `Connecté en tant que ${currentUser}`;
+    collectionCTA.style.display = 'none';
+  }
+
+  // favorites
+  const favArray = Array.from(favSet).map(id => findArtwork(id)).filter(Boolean)
+    .sort((a,b)=> a.title.localeCompare(b.title));
+  if(favArray.length>0){
+    const favHeader = document.createElement('li');
+    favHeader.textContent = 'Favoris';
+    favHeader.style.fontWeight='700';
+    collectionList.appendChild(favHeader);
+
+    favArray.forEach(art => {
+      const li = document.createElement('li');
+      li.innerHTML = `${escapeHtml(art.title)} <button class="btn small" style="float:right" onclick="playArtworkById('${art.id}')">Écouter</button>`;
+      collectionList.appendChild(li);
+    });
+  }
+
+  // visited (but not favorites)
+  const otherVisited = Array.from(visitedSet).filter(id => !favSet.has(id))
+    .map(id => findArtwork(id)).filter(Boolean)
+    .sort((a,b)=> a.title.localeCompare(b.title));
+  if(otherVisited.length>0){
+    const header = document.createElement('li');
+    header.textContent = 'Consultées';
+    header.style.fontWeight='700';
+    header.style.marginTop='8px';
+    collectionList.appendChild(header);
+
+    otherVisited.forEach(art => {
+      const li = document.createElement('li');
+      li.innerHTML = `${escapeHtml(art.title)} <button class="btn small" style="float:right" onclick="playArtworkById('${art.id}')">Écouter</button>`;
+      collectionList.appendChild(li);
+    });
+  }
+
+  if(favArray.length===0 && otherVisited.length===0){
+    const li = document.createElement('li');
+    li.textContent = 'Aucune œuvre pour le moment. Cliquez sur une œuvre pour l’écouter.';
+    collectionList.appendChild(li);
+  }
+}
+
+/* save helpers for favorites/visited */
+function saveFavoritesSet(set){
+  if(currentUser){
+    if(!USERS[currentUser]) USERS[currentUser] = { password:'', favorites:[], visited:[] };
+    USERS[currentUser].favorites = Array.from(set);
+    persistUsers();
+  } else {
+    guestFavorites = new Set(Array.from(set));
+    localStorage.setItem('ab_favs', JSON.stringify(Array.from(guestFavorites)));
+  }
+}
+function saveVisitedSet(set){
+  if(currentUser){
+    if(!USERS[currentUser]) USERS[currentUser] = { password:'', favorites:[], visited:[] };
+    USERS[currentUser].visited = Array.from(set);
+    persistUsers();
+  } else {
+    guestVisited = new Set(Array.from(set));
+    localStorage.setItem('ab_visited', JSON.stringify(Array.from(guestVisited)));
+  }
+}
+
+/* ---------- Simulate Wi-Fi detection ---------- */
+function simulateDetection(){
+  status.textContent = 'Détection Wi-Fi en cours…';
+  // small UX delay
+  setTimeout(()=>{
+    // pick a random room
+    const keys = Object.keys(ROOMS);
+    const choice = keys[Math.floor(Math.random()*keys.length)];
+    renderRoom(ROOMS[choice]);
+    // scroll to top to show room
+    window.scrollTo({top:0,behavior:'smooth'});
+  }, 700);
+}
+
+/* ---------- Overlay & initial activation ---------- */
+function showAudioOverlay(){ audioOverlay.style.display='flex'; }
+function hideAudioOverlay(){ audioOverlay.style.display='none'; }
+
+/* ---------- Utility svg icons ---------- */
+function starSvg(active=false){
+  if(active){
+    return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M12 17.3l-6.16 3.24 1.18-6.88L2.7 9.76l6.95-1.01L12 2.5l2.35 6.25 6.95 1.01-4.32 4.9 1.18 6.88z" fill="#FFCC00"/></svg>`;
+  }
+  return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M12 17.3l-6.16 3.24 1.18-6.88L2.7 9.76l6.95-1.01L12 2.5l2.35 6.25 6.95 1.01-4.32 4.9 1.18 6.88z" stroke="#bbb" stroke-width="1.2" fill="none"/></svg>`;
+}
+function playSvg(){
+  return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden><path d="M5 3v18l15-9z" fill="#6a5acd"/></svg>`;
+}
+
+/* ---------- Account / Login logic ---------- */
+/* show account menu or login depending on state */
+function updateAccountUI(){
+  if(currentUser && USERS[currentUser]){
+    accountBtn.textContent = currentUser;
+    menuPopup.innerHTML = `
+      <button onclick="viewProfile()">Mon compte</button>
+      <button onclick="logout()">Se déconnecter</button>
+    `;
+    menuPopup.style.display = 'none';
+    menuPopup.setAttribute('aria-hidden','true');
+  } else {
+    accountBtn.textContent = 'Connexion';
+    menuPopup.innerHTML = `<button onclick="openLoginModal()">Se connecter / Créer un compte</button>`;
+    menuPopup.style.display = 'none';
+    menuPopup.setAttribute('aria-hidden','true');
+  }
+}
+
+/* toggle menu */
+accountBtn.addEventListener('click', ()=>{
+  if(menuPopup.style.display === 'block'){ menuPopup.style.display = 'none'; menuPopup.setAttribute('aria-hidden','true'); }
+  else { menuPopup.style.display = 'block'; menuPopup.setAttribute('aria-hidden','false'); }
 });
 
+/* open login modal */
+function openLoginModal(){
+  loginModal.style.display = 'flex';
+  loginModal.setAttribute('aria-hidden','false');
+  menuPopup.style.display = 'none';
+  menuPopup.setAttribute('aria-hidden','true');
+}
+
+/* close login */
 closeLogin.addEventListener('click', ()=>{
-  loginModal.style.display='none';
+  loginModal.style.display = 'none';
   loginModal.setAttribute('aria-hidden','true');
 });
 
-ctaLogin.addEventListener('click', ()=>{
-  loginModal.style.display='flex';
-  loginModal.setAttribute('aria-hidden','false');
+/* login & register handlers */
+loginSubmit.addEventListener('click', ()=>{
+  const email = (loginEmail.value || '').trim().toLowerCase();
+  const pass = (loginPassword.value || '').trim();
+  if(!email || !pass){ alert('Email et mot de passe requis'); return; }
+  if(!USERS[email]){ alert('Compte introuvable. Créez un compte.'); return; }
+  if(USERS[email].password !== pass){ alert('Mot de passe incorrect'); return; }
+  // successful login
+  setCurrentUser(email);
+  loginModal.style.display = 'none';
+  loginModal.setAttribute('aria-hidden','true');
+  // ensure sets exist
+  USERS[email].favorites = USERS[email].favorites || [];
+  USERS[email].visited = USERS[email].visited || [];
+  persistUsers();
+  renderRoom(currentRoom || ROOMS[Object.keys(ROOMS)[0]]);
+  alert('Connecté en tant que ' + email);
 });
 
-/* ---------- Init ---------- */
-renderCollection();
-</script>
+registerSubmit.addEventListener('click', ()=>{
+  const email = (loginEmail.value || '').trim().toLowerCase();
+  const pass = (loginPassword.value || '').trim();
+  if(!email || !pass){ alert('Email et mot de passe requis'); return; }
+  if(USERS[email]){ alert('Ce compte existe déjà'); return; }
+  USERS[email] = { password: pass, favorites: Array.from(guestFavorites), visited: Array.from(guestVisited) };
+  persistUsers();
+  setCurrentUser(email);
+  loginModal.style.display = 'none';
+  loginModal.setAttribute('aria-hidden','true');
+  alert('Compte créé et connecté : ' + email);
+});
 
+/* view profile (simple) */
+function viewProfile(){
+  menuPopup.style.display = 'none';
+  menuPopup.setAttribute('aria-hidden','true');
+  alert('Profil: ' + currentUser + '\nFavoris: ' + JSON.stringify(USERS[currentUser].favorites || []) );
+}
+
+/* logout */
+function logout(){
+  setCurrentUser(null);
+  alert('Déconnecté');
+}
+
+/* CTA login button in collection area */
+ctaLogin.addEventListener('click', ()=>{
+  openLoginModal();
+});
+
+/* ---------- keyboard + UI wiring ---------- */
+simulateBtn.addEventListener('click', simulateDetection);
+openCollectionBtn.addEventListener('click', ()=>{ window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}); });
+
+enableSoundBtn.addEventListener('click', ()=>{
+  transitionAllowed = true;
+  // play a tiny click to ensure audio context allowed
+  playTransitionTone(80,1000,0.06);
+  hideAudioOverlay();
+});
+
+/* On first load: show overlay so user can allow audio if they want automatic playback */
+window.addEventListener('load', ()=>{
+  audioOverlay.style.display = 'flex';
+  // restore current user if any
+  if(currentUser && !USERS[currentUser]){ currentUser = null; localStorage.removeItem('ab_current'); }
+  updateAccountUI();
+  renderCollection();
+});
+
+/* expose a couple helpers for buttons created dynamically */
+window.playArtworkById = playArtworkById;
+window.toggleFav = toggleFav;
+window.stopCurrentAudio = stopCurrentAudio;
+
+</script>
 </body>
 </html>
