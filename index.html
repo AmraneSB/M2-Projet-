@@ -190,6 +190,13 @@
     position:fixed; inset:0; background:rgba(0,0,0,0.25); z-index:150; display:none;
   }
   .sidebar-overlay.visible { display:block; }
+
+  /* ---------- Collection page ---------- */
+  #collectionPage { display:none; padding:18px; max-width:820px; margin:0 auto; width:100%; }
+  #collectionPage .back-btn { display:inline-flex; gap:8px; align-items:center; padding:8px 10px; border-radius:10px; border:none; cursor:pointer; background:var(--card); box-shadow:0 4px 10px rgba(0,0,0,0.06); font-weight:700; color:var(--primary); }
+  #collectionPage h2 { margin-top:12px; margin-bottom:6px; }
+  .collection-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:12px; }
+  @media (max-width:520px){ .collection-grid{ grid-template-columns:1fr } }
 </style>
 </head>
 <body>
@@ -243,7 +250,8 @@
 </div>
 <div id="sidebarOverlay" class="sidebar-overlay" tabindex="-1" aria-hidden="true"></div>
 
-<main>
+<!-- MAIN VIEW -->
+<main id="mainView">
   <div id="status" style="text-align:center;margin-top:12px;color:#333;font-size:14px">
     En attente de détection Wi-Fi…
     <small id="networkDetails"></small>
@@ -278,6 +286,14 @@
     </div>
   </div>
 </main>
+
+<!-- COLLECTION PAGE (dedicated) -->
+<div id="collectionPage" aria-hidden="true">
+  <button class="back-btn" id="collectionBackBtn">← Retour à l'exploration</button>
+  <h2>Ma page Collection</h2>
+  <p style="color:var(--muted); margin-top:6px">Toutes les œuvres que tu as consultées sont affichées ci-dessous. Utilise les boutons pour écouter ou ajouter aux favoris.</p>
+  <div id="collectionGrid" class="collection-grid" style="margin-top:12px"></div>
+</div>
 
 <!-- Floating stop -->
 <button id="stopBtn" class="stop-btn" title="Arrêter l'audio" onclick="stopCurrentAudio()">■ Stop</button>
@@ -402,6 +418,11 @@ const sidebarClose = document.getElementById('sidebarClose');
 const sidebarOverlay = document.getElementById('sidebarOverlay');
 const sidebarNav = document.getElementById('sidebarNav');
 const sidebarFavs = document.getElementById('sidebarFavs');
+
+const mainView = document.getElementById('mainView');
+const collectionPage = document.getElementById('collectionPage');
+const collectionGrid = document.getElementById('collectionGrid');
+const collectionBackBtn = document.getElementById('collectionBackBtn');
 
 /* ---------- Helpers: storage & users ---------- */
 function persistUsers(){ localStorage.setItem('ab_users', JSON.stringify(USERS)); }
@@ -896,7 +917,7 @@ ctaLogin.addEventListener('click', ()=>{ openLoginModal(); });
 
 /* ---------- keyboard + UI wiring ---------- */
 simulateBtn.addEventListener('click', simulateDetection);
-openCollectionBtn.addEventListener('click', ()=>{ window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}); });
+openCollectionBtn.addEventListener('click', ()=>{ openCollectionPage(); });
 
 enableSoundBtn.addEventListener('click', ()=>{
   transitionAllowed = true;
@@ -954,9 +975,15 @@ function renderSidebar(){
     const r = ROOMS[rKey];
     const btn = document.createElement('button');
     btn.textContent = r.name;
-    btn.onclick = ()=>{ renderRoom(r); toggleSidebar(false); window.scrollTo({top:0,behavior:'smooth'}); };
+    btn.onclick = ()=>{ renderMainView(); renderRoom(r); toggleSidebar(false); window.scrollTo({top:0,behavior:'smooth'}); };
     sidebarNav.appendChild(btn);
   }
+
+  // add quick nav to collection page
+  const collBtn = document.createElement('button');
+  collBtn.textContent = 'Ma collection';
+  collBtn.onclick = ()=>{ toggleSidebar(false); openCollectionPage(); };
+  sidebarNav.appendChild(collBtn);
 
   // favorites
   sidebarFavs.innerHTML = '';
@@ -996,6 +1023,93 @@ function removeFromFavorites(id){
   renderSidebar();
 }
 
+/* ---------- COLLECTION PAGE: render & routing ---------- */
+function renderCollectionPage(){
+  // build list of visited artworks (unique)
+  const visited = [...getVisitedSet()];
+  const favSet = getFavoritesSet();
+
+  // show page, hide main
+  mainView.style.display = 'none';
+  collectionPage.style.display = 'block';
+  collectionPage.setAttribute('aria-hidden','false');
+
+  collectionGrid.innerHTML = '';
+
+  if(visited.length === 0){
+    const p = document.createElement('div');
+    p.style.color = 'var(--muted)';
+    p.textContent = "Tu n'as encore consulté aucune œuvre. Écoute une œuvre depuis la galerie pour la voir apparaître ici.";
+    collectionGrid.appendChild(p);
+    // push to history so back button works
+    history.pushState({page:'collection'}, '', '#collection');
+    return;
+  }
+
+  // For each visited artwork, show card similar to main grid
+  visited.forEach(id=>{
+    const art = findArtwork(id);
+    if(!art) return;
+    const card = document.createElement('div');
+    card.className = 'card fade-in';
+    card.style.paddingBottom = '8px';
+    card.innerHTML = `
+      <img class="thumb" src="${art.img}" alt="${escapeHtml(art.title)}">
+      <div class="meta">
+        <h3>${escapeHtml(art.title)}</h3>
+        <div class="meta-row">
+          <div class="muted">Consultée</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="icon-btn" title="Favoris" data-art="${art.id}" aria-label="Favoris">
+              ${favSet.has(art.id) ? starSvg(true) : starSvg(false)}
+            </button>
+            <button class="icon-btn" title="Écouter" data-play="${art.id}" aria-label="Écouter">
+              ${playSvg()}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    // wire events (reuse same handlers)
+    card.querySelectorAll('[data-art]').forEach(btn=> btn.addEventListener('click', (e)=>{ e.stopPropagation(); toggleFav(btn.getAttribute('data-art')); renderCollectionPage(); }));
+    card.querySelectorAll('[data-play]').forEach(btn=> btn.addEventListener('click', (e)=>{ e.stopPropagation(); playArtworkById(btn.getAttribute('data-play')); }));
+
+    card.addEventListener('click', ()=> playArtworkById(art.id));
+    collectionGrid.appendChild(card);
+  });
+
+  // push state for navigation
+  history.pushState({page:'collection'}, '', '#collection');
+}
+
+function openCollectionPage(){
+  renderCollectionPage();
+}
+
+/* go back to main view */
+function renderMainView(){
+  collectionPage.style.display = 'none';
+  collectionPage.setAttribute('aria-hidden','true');
+  mainView.style.display = 'block';
+  // restore default room title etc.
+  history.pushState({page:'main'}, '', location.pathname);
+}
+
+/* wire back button and popstate */
+collectionBackBtn.addEventListener('click', ()=>{
+  renderMainView();
+});
+
+window.addEventListener('popstate', (ev)=>{
+  // simple popstate handling: if state says collection => show collection, otherwise main
+  const state = ev.state || {};
+  if(state.page === 'collection'){
+    renderCollectionPage();
+  } else {
+    renderMainView();
+  }
+});
+
 /* ---------- Initial load ---------- */
 window.addEventListener('load', ()=>{
   // show overlay once so user can opt-in to audio
@@ -1013,6 +1127,9 @@ window.addEventListener('load', ()=>{
   applySavedTheme();
   // render sidebar contents initially
   renderSidebar();
+
+  // if the URL already contains #collection on load, open that page
+  if(location.hash === '#collection') renderCollectionPage();
 });
 
 /* expose helpers globally for inline onclicks */
