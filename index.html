@@ -6,25 +6,64 @@
 <title>Apollo Beats — Prototype SPA</title>
 <style>
   :root{
-    --bg:#f6f7fb;
-    --primary:#6a5acd;
-    --primary-strong:#5a40c8;
-    --card:#ffffff;
-    --muted:#6b6b80;
-    --accent:#ffcc00;
-    --radius:12px;
-    --sidebar-width:300px;
-  }
+  --bg:#f3f4f8;
+  --primary:#6c4df7;              /* Violet lumineux */
+  --primary-strong:#5b3be6;       /* Violet profond */
+  --card:#ffffff;
+  --muted:#6d6f80;
+  --accent:#ffb224;               /* Accent ambré premium */
+  --radius:14px;
+  --sidebar-width:300px;
+
+  --shadow-sm:0 2px 6px rgba(0,0,0,0.06);
+  --shadow-md:0 6px 20px rgba(0,0,0,0.08);
+  --shadow-lg:0 14px 40px rgba(0,0,0,0.12);
+}
 
   /* Dark theme variables (manual toggle will add .dark on body) */
-  body.dark{
-    --bg:#0b0d12;
-    --primary:#9aa3ff;
-    --primary-strong:#7d6eff;
-    --card:#0f1720;
-    --muted:#98a0b3;
-    --accent:#ffcf66;
-  }
+ body.dark{
+  --bg:#0c0e15;
+  --primary:#b6a7ff;               /* Violet clair pour lisibilité */
+  --primary-strong:#9c8dff;
+  --card:#141926;
+  --muted:#a2a7b9;
+  --accent:#ffcb5c;
+
+  --shadow-sm:0 2px 6px rgba(0,0,0,0.25);
+  --shadow-md:0 6px 20px rgba(0,0,0,0.32);
+  --shadow-lg:0 14px 40px rgba(0,0,0,0.45);
+}
+
+
+body.dark .oeuvre-card,
+body.dark .card,
+body.dark .artwork-card {
+  background: var(--card);
+  color: #fff !important;
+}
+
+body.dark .oeuvre-card h3,
+body.dark .card h3,
+body.dark .artwork-card h3,
+body.dark .oeuvre-card p,
+body.dark .card p,
+body.dark .artwork-card p {
+  color: #fff !important;
+}
+body.dark .zone-title,
+body.dark .salle-title,
+body.dark h2,
+body.dark h3 {
+  color: #fff !important;
+}
+body.dark button,
+body.dark .btn {
+  color: #fff !important;
+  background: var(--primary-strong) !important;
+  border-color: var(--primary) !important;
+}
+
+
 
   *{box-sizing:border-box}
   body{
