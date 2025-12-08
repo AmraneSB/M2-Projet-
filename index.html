@@ -236,6 +236,27 @@ body.dark .btn {
   #collectionPage h2 { margin-top:12px; margin-bottom:6px; }
   .collection-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:12px; }
   @media (max-width:520px){ .collection-grid{ grid-template-columns:1fr } }
+
+/* --- Lightbox pour les images grand format --- */
+
+
+#fullscreenBox {
+  position: fixed;
+  inset: 0;
+  display: none;
+  background: rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+#fullscreenBox img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
+}
+
+
 </style>
 </head>
 <body>
@@ -368,7 +389,22 @@ body.dark .btn {
   </div>
 </div>
 
+<div id="fullscreenBox" onclick="this.style.display='none'">
+  <img id="fullscreenPicture">
+</div>
+
+
+
 <script>
+
+
+function openFullscreenImage(src) {
+  document.getElementById("fullscreenPicture").src = src;
+  document.getElementById("fullscreenBox").style.display = "flex";
+}
+
+
+
 /* ---------- ROOMS & artworks ---------- */
 const ROOMS = {
   impressionnisme: {
@@ -1093,7 +1129,8 @@ function renderCollectionPage(){
     card.className = 'card fade-in';
     card.style.paddingBottom = '8px';
     card.innerHTML = `
-      <img class="thumb" src="${art.img}" alt="${escapeHtml(art.title)}">
+      <img class="thumb" src="${art.img}" alt="${escapeHtml(art.title)}" onclick="openFullscreenImage('${art.img}')">
+
       <div class="meta">
         <h3>${escapeHtml(art.title)}</h3>
         <div class="meta-row">
